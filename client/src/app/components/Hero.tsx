@@ -1,0 +1,82 @@
+import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
+import { InteractiveMap } from '@/app/components/InteractiveMap';
+import { Button } from '@/app/components/ui/button';
+import { Sparkles } from 'lucide-react';
+import { Page } from '@/app/App';
+
+interface HeroProps {
+  setCurrentPage: (page: Page) => void;
+}
+
+export function Hero({ setCurrentPage }: HeroProps) {
+  return (
+    <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <ImageWithFallback
+          src="https://images.unsplash.com/photo-1689322375612-652dd0745c4f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3JvY2NvJTIwZGVzZXJ0JTIwc2FoYXJhJTIwc3Vuc2V0fGVufDF8fHx8MTc2OTcwMjI5NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+          alt="Moroccan Desert Sunset"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent"></div>
+      </div>
+
+      {/* Decorative Pattern Overlay */}
+      <div className="absolute inset-0 opacity-10" style={{
+        backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(20, 184, 166, 0.3) 35px, rgba(20, 184, 166, 0.3) 70px)`
+      }}></div>
+
+      {/* Content */}
+      <div className="relative z-10 container mx-auto px-4 text-white">
+        <div className="max-w-3xl">
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles className="w-6 h-6 text-cyan-400" />
+            <span className="text-cyan-400 uppercase tracking-wider">Discover Eastern Morocco</span>
+          </div>
+          <h1 className="text-5xl md:text-7xl mb-6">
+            Explore the Hidden Treasures of
+            <span className="block text-cyan-400">L'Oriental</span>
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 text-gray-200">
+            From Mediterranean coasts to desert oases - customize your journey through Eastern Morocco's authentic wonders
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Button
+              onClick={() => {
+                setCurrentPage('book');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              size="lg"
+              className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white hover:from-teal-600 hover:to-cyan-700 text-lg px-8"
+            >
+              Book Your Trip
+            </Button>
+            <Button
+              onClick={() => {
+                document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              size="lg"
+              variant="outline"
+              className="text-white border-white hover:bg-white hover:text-teal-900 text-lg px-8"
+            >
+              Explore Services
+            </Button>
+          </div>
+        </div>
+      </div>
+
+
+      {/* Scroll Indicator */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div className="w-6 h-10 border-2 border-white rounded-full flex items-start justify-center p-2">
+          <div className="w-1 h-3 bg-white rounded-full"></div>
+        </div>
+      </div>
+
+      {/* Hero Map Widget */}
+      <div className="hidden xl:block absolute bottom-8 right-8 w-[400px] z-20">
+        <InteractiveMap variant="hero" />
+      </div>
+    </section>
+  );
+}
