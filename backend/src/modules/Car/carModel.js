@@ -7,6 +7,10 @@ const carSchema = new mongoose.Schema({
   transmission: { type: String },
   pricePerDay: { type: Number, required: true },
   available: { type: Boolean, default: true },
+<<<<<<< HEAD
+=======
+  imageUrl: { type: String }, // Optional: URL to car image
+>>>>>>> Taoufiq
 });
 
 module.exports = mongoose.model("Car", carSchema);

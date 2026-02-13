@@ -4,6 +4,7 @@ const paymentSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
+<<<<<<< HEAD
       ref: 'User',
       required: false // Allow guest checkout if needed
     },
@@ -18,16 +19,27 @@ const paymentSchema = new mongoose.Schema(
       type: { type: String, enum: ['hotel', 'car', 'activity'] },
       details: String
     }],
+=======
+      required: true
+    },
+    bookingId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true
+    },
+>>>>>>> Taoufiq
     amount: {
       type: Number,
       required: true,
       min: 0
     },
+<<<<<<< HEAD
     customerName: String,
     paymentMethod: {
       type: String,
       default: 'credit_card'
     },
+=======
+>>>>>>> Taoufiq
     status: {
       type: String,
       enum: ['pending', 'completed', 'failed', 'refunded'],

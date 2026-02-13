@@ -13,7 +13,11 @@ export function Footer({ setCurrentPage, currentUser }: FooterProps) {
   };
 
   return (
+<<<<<<< HEAD
     <footer className="bg-background text-white py-16 border-t border-white/5">
+=======
+    <footer className="bg-gradient-to-br from-teal-900 to-cyan-900 text-white py-12">
+>>>>>>> Taoufiq
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* Company Info */}

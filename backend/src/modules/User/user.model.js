@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
+<<<<<<< HEAD
 const crypto = require("crypto");
+=======
+>>>>>>> Taoufiq
 
 const userSchema = new mongoose.Schema(
   {
@@ -20,7 +23,11 @@ const userSchema = new mongoose.Schema(
       required: function () {
         return !this.googleId && !this.githubId;
       },
+<<<<<<< HEAD
       minlength: 12,
+=======
+      minlength: 6,
+>>>>>>> Taoufiq
     },
     role: {
       type: String,
@@ -33,11 +40,15 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+<<<<<<< HEAD
     resetPasswordExpire: Date,
+=======
+>>>>>>> Taoufiq
   },
   { timestamps: true },
 );
 
+<<<<<<< HEAD
 // Generate and hash password token
 userSchema.methods.getResetPasswordToken = function () {
   // Generate token
@@ -55,4 +66,6 @@ userSchema.methods.getResetPasswordToken = function () {
   return resetToken;
 };
 
+=======
+>>>>>>> Taoufiq
 module.exports = mongoose.model("User", userSchema);

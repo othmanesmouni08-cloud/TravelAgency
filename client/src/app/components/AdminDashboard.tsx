@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
+<<<<<<< HEAD
 import { motion, AnimatePresence } from 'motion/react';
+=======
+>>>>>>> Taoufiq
 import {
     LayoutDashboard,
     Hotel,
@@ -17,11 +20,15 @@ import {
     Trash2,
     Edit3,
     MapPin,
+<<<<<<< HEAD
     Sparkles,
     LogOut,
     Home,
     Menu,
     X
+=======
+    Sparkles
+>>>>>>> Taoufiq
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
@@ -49,6 +56,7 @@ export function AdminDashboard() {
     const [searchQuery, setSearchQuery] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<{ id: string; data: any } | null>(null);
+<<<<<<< HEAD
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -57,6 +65,8 @@ export function AdminDashboard() {
         setActiveSection(section);
         setIsSidebarOpen(false);
     };
+=======
+>>>>>>> Taoufiq
 
     // Simulated Data
     const [hotels, setHotels] = useState([
@@ -145,6 +155,7 @@ export function AdminDashboard() {
     ];
 
     return (
+<<<<<<< HEAD
         <div className="min-h-screen bg-gray-50 flex overflow-hidden">
             {/* Sidebar Toggle */}
             <button
@@ -217,6 +228,29 @@ export function AdminDashboard() {
 
             {/* Main Content */}
             <main className={`flex-1 transition-all duration-500 ml-0 pt-24 p-8`}>
+=======
+        <div className="min-h-screen bg-gray-50 flex">
+            {/* Sidebar */}
+            <aside className="w-64 bg-teal-900 text-white fixed h-full pt-20">
+                <div className="px-6 py-8">
+                    <h2 className="text-xl font-bold mb-8 flex items-center gap-2 text-teal-200 uppercase tracking-widest">
+                        Back Office
+                    </h2>
+                    <nav className="space-y-4">
+                        <SidebarLink icon={LayoutDashboard} label="Overview" active={activeSection === 'overview'} onClick={() => setActiveSection('overview')} />
+                        <SidebarLink icon={Sparkles} label="Agency Services" active={activeSection === 'services'} onClick={() => setActiveSection('services')} />
+                        <SidebarLink icon={MapPin} label="Packages" active={activeSection === 'packages'} onClick={() => setActiveSection('packages')} />
+                        <SidebarLink icon={Hotel} label="Hotels" active={activeSection === 'hotels'} onClick={() => setActiveSection('hotels')} />
+                        <SidebarLink icon={Car} label="Cars" active={activeSection === 'cars'} onClick={() => setActiveSection('cars')} />
+                        <SidebarLink icon={Activities} label="Activities" active={activeSection === 'activities'} onClick={() => setActiveSection('activities')} />
+                        <SidebarLink icon={CalendarDays} label="Bookings" active={activeSection === 'bookings'} onClick={() => setActiveSection('bookings')} />
+                    </nav>
+                </div>
+            </aside>
+
+            {/* Main Content */}
+            <main className="flex-1 ml-64 pt-24 p-8">
+>>>>>>> Taoufiq
                 <div className="max-w-7xl mx-auto">
                     <div className="flex justify-between items-center mb-8">
                         <div>

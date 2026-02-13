@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
+=======
+import { useState } from 'react';
+>>>>>>> Taoufiq
 import { Header } from '@/app/components/Header';
 import { Hero } from '@/app/components/Hero';
 import { Services } from '@/app/components/Services';
@@ -13,14 +17,22 @@ import { CustomizePage } from '@/app/components/CustomizePage';
 import { Toaster, toast } from 'sonner';
 import { AuthPage } from '@/app/components/AuthPage';
 import { InteractiveMap } from '@/app/components/InteractiveMap';
+<<<<<<< HEAD
 import { AnimatePresence, motion } from 'motion/react';
+=======
+>>>>>>> Taoufiq
 
 import { FinalPaymentPage } from '@/app/components/FinalPaymentPage';
 import { BasketPage } from './components/BasketPage';
 import { AdminDashboard } from './components/AdminDashboard';
+<<<<<<< HEAD
 import { ResetPasswordPage } from './components/ResetPasswordPage';
 
 export type Page = 'home' | 'cars' | 'hotels' | 'activities' | 'book' | 'customize' | 'login' | 'signup' | 'payment' | 'basket' | 'admin' | 'reset-password';
+=======
+
+export type Page = 'home' | 'cars' | 'hotels' | 'activities' | 'book' | 'customize' | 'login' | 'signup' | 'payment' | 'basket' | 'admin';
+>>>>>>> Taoufiq
 
 export interface CartItem {
   id: string;
@@ -29,6 +41,14 @@ export interface CartItem {
   type: 'hotel' | 'car' | 'activity';
   image?: string;
   details?: string;
+<<<<<<< HEAD
+=======
+  startDate?: string;
+  endDate?: string;
+  pickupLocation?: string;
+  dropoffLocation?: string;
+  totalDays?: number;
+>>>>>>> Taoufiq
 }
 
 export interface User {
@@ -37,6 +57,7 @@ export interface User {
   name: string;
 }
 
+<<<<<<< HEAD
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
   animate: {
@@ -51,10 +72,13 @@ const pageVariants = {
   }
 };
 
+=======
+>>>>>>> Taoufiq
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+<<<<<<< HEAD
   const [resetToken, setResetToken] = useState<string | null>(null);
 
   // Simple routing for reset password
@@ -66,6 +90,8 @@ export default function App() {
       setCurrentPage('reset-password');
     }
   }, []);
+=======
+>>>>>>> Taoufiq
 
   const handleLogin = (user: User) => {
     setCurrentUser(user);
@@ -95,6 +121,7 @@ export default function App() {
   const clearCart = () => setCart([]);
 
   return (
+<<<<<<< HEAD
     <div className="min-h-screen bg-background">
       {currentPage !== 'admin' && (
         <Header
@@ -170,6 +197,57 @@ export default function App() {
           </motion.div>
         </AnimatePresence>
       </main>
+=======
+    <div className="min-h-screen">
+      <Header
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        cartCount={cart.length}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+      />
+
+      {currentPage === 'home' && (
+        <>
+          <Hero setCurrentPage={setCurrentPage} />
+          <Services setCurrentPage={setCurrentPage} />
+          <Destinations />
+          <Activities />
+          <InteractiveMap />
+        </>
+      )}
+
+      {currentPage === 'cars' && <CarsPage addToCart={addToCart} cart={cart} />}
+      {currentPage === 'hotels' && <HotelsPage addToCart={addToCart} cart={cart} />}
+      {currentPage === 'activities' && <ActivitiesPage addToCart={addToCart} cart={cart} />}
+      {currentPage === 'customize' && <CustomizePage />}
+      {currentPage === 'basket' && (
+        <BasketPage
+          cart={cart}
+          removeFromCart={removeFromCart}
+          onProceed={() => setCurrentPage('book')}
+        />
+      )}
+      {currentPage === 'book' && <BookPage onProceedToPayment={() => setCurrentPage('payment')} />}
+      {currentPage === 'payment' && (
+        <FinalPaymentPage
+          cart={cart}
+          onComplete={() => {
+            clearCart();
+            setCurrentPage('home');
+          }}
+        />
+      )}
+      {currentPage === 'admin' && <AdminDashboard />}
+
+      {(currentPage === 'login' || currentPage === 'signup') && (
+        <AuthPage
+          initialMode={currentPage === 'login' ? 'login' : 'signup'}
+          onBackToHome={() => setCurrentPage('home')}
+          onLogin={handleLogin}
+        />
+      )}
+>>>>>>> Taoufiq
 
       <Footer setCurrentPage={setCurrentPage} currentUser={currentUser} />
       <Toaster position="top-center" />
