@@ -108,7 +108,7 @@ export default function App() {
                 <Services setCurrentPage={setCurrentPage} />
                 <Destinations />
                 <Activities />
-                <InteractiveMap />
+                <InteractiveMap setCurrentPage={setCurrentPage} />
               </>
             )}
 
