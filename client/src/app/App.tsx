@@ -84,13 +84,15 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        cartCount={cart.length}
-        currentUser={currentUser}
-        onLogout={handleLogout}
-      />
+      {currentPage !== 'admin' && (
+        <Header
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          cartCount={cart.length}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+        />
+      )}
 
       <main className="relative">
         <AnimatePresence mode="wait">

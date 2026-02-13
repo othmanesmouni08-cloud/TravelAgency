@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'motion/react';
 import {
     LayoutDashboard,
     Hotel,
@@ -16,7 +17,11 @@ import {
     Trash2,
     Edit3,
     MapPin,
-    Sparkles
+    Sparkles,
+    LogOut,
+    Home,
+    Menu,
+    X
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
@@ -44,6 +49,14 @@ export function AdminDashboard() {
     const [searchQuery, setSearchQuery] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<{ id: string; data: any } | null>(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+    const handleSectionChange = (section: AdminSection) => {
+        setActiveSection(section);
+        setIsSidebarOpen(false);
+    };
 
     // Simulated Data
     const [hotels, setHotels] = useState([
@@ -132,27 +145,78 @@ export function AdminDashboard() {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            {/* Sidebar */}
-            <aside className="w-64 bg-teal-900 text-white fixed h-full pt-20">
-                <div className="px-6 py-8">
-                    <h2 className="text-xl font-bold mb-8 flex items-center gap-2 text-teal-200 uppercase tracking-widest">
-                        Back Office
-                    </h2>
-                    <nav className="space-y-4">
-                        <SidebarLink icon={LayoutDashboard} label="Overview" active={activeSection === 'overview'} onClick={() => setActiveSection('overview')} />
-                        <SidebarLink icon={Sparkles} label="Agency Services" active={activeSection === 'services'} onClick={() => setActiveSection('services')} />
-                        <SidebarLink icon={MapPin} label="Packages" active={activeSection === 'packages'} onClick={() => setActiveSection('packages')} />
-                        <SidebarLink icon={Hotel} label="Hotels" active={activeSection === 'hotels'} onClick={() => setActiveSection('hotels')} />
-                        <SidebarLink icon={Car} label="Cars" active={activeSection === 'cars'} onClick={() => setActiveSection('cars')} />
-                        <SidebarLink icon={Activities} label="Activities" active={activeSection === 'activities'} onClick={() => setActiveSection('activities')} />
-                        <SidebarLink icon={CalendarDays} label="Bookings" active={activeSection === 'bookings'} onClick={() => setActiveSection('bookings')} />
-                    </nav>
-                </div>
-            </aside>
+        <div className="min-h-screen bg-gray-50 flex overflow-hidden">
+            {/* Sidebar Toggle */}
+            <button
+                onClick={toggleSidebar}
+                className="fixed top-6 left-6 z-[60] p-2 bg-teal-900 text-white rounded-lg shadow-xl hover:bg-teal-800 transition-colors"
+            >
+                {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+
+            {/* Sidebar with Transition */}
+            <AnimatePresence mode="wait">
+                {isSidebarOpen && (
+                    <motion.aside
+                        initial={{ x: -260, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: -260, opacity: 0 }}
+                        transition={{ type: "spring", damping: 20, stiffness: 100 }}
+                        className="w-64 bg-teal-900 text-white fixed h-full pt-20 z-50 shadow-2xl"
+                    >
+                        <div className="px-6 py-8 flex flex-col h-full bg-teal-900/40 backdrop-blur-xl">
+                            <h2 className="text-xl font-bold mb-8 flex items-center gap-2 text-teal-200 uppercase tracking-widest">
+                                Back Office
+                            </h2>
+                            <nav className="space-y-3 flex-grow overflow-y-auto custom-scrollbar pr-2">
+                                <SidebarLink icon={LayoutDashboard} label="Overview" active={activeSection === 'overview'} onClick={() => handleSectionChange('overview')} />
+                                <SidebarLink icon={Sparkles} label="Agency Services" active={activeSection === 'services'} onClick={() => handleSectionChange('services')} />
+                                <SidebarLink icon={MapPin} label="Packages" active={activeSection === 'packages'} onClick={() => handleSectionChange('packages')} />
+                                <SidebarLink icon={Hotel} label="Hotels" active={activeSection === 'hotels'} onClick={() => handleSectionChange('hotels')} />
+                                <SidebarLink icon={Car} label="Cars" active={activeSection === 'cars'} onClick={() => handleSectionChange('cars')} />
+                                <SidebarLink icon={Activities} label="Activities" active={activeSection === 'activities'} onClick={() => handleSectionChange('activities')} />
+                                <SidebarLink icon={CalendarDays} label="Bookings" active={activeSection === 'bookings'} onClick={() => handleSectionChange('bookings')} />
+                            </nav>
+                            <div className="mt-auto pt-8 border-t border-teal-800/50 space-y-3">
+                                <button
+                                    onClick={() => window.location.href = '/'}
+                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-teal-200 hover:bg-white/10 hover:text-white group"
+                                >
+                                    <div className="p-2 rounded-lg bg-teal-800 group-hover:bg-teal-700 transition-colors">
+                                        <Home className="w-4 h-4" />
+                                    </div>
+                                    <span className="font-medium">Back to Site</span>
+                                </button>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-red-300 hover:bg-red-500/10 hover:text-red-200 group"
+                                >
+                                    <div className="p-2 rounded-lg bg-red-900/50 group-hover:bg-red-900 transition-colors">
+                                        <LogOut className="w-4 h-4" />
+                                    </div>
+                                    <span className="font-medium">Log Out</span>
+                                </button>
+                            </div>
+                        </div>
+                    </motion.aside>
+                )}
+            </AnimatePresence>
+
+            {/* Overlay */}
+            <AnimatePresence>
+                {isSidebarOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                    />
+                )}
+            </AnimatePresence>
 
             {/* Main Content */}
-            <main className="flex-1 ml-64 pt-24 p-8">
+            <main className={`flex-1 transition-all duration-500 ml-0 pt-24 p-8`}>
                 <div className="max-w-7xl mx-auto">
                     <div className="flex justify-between items-center mb-8">
                         <div>
