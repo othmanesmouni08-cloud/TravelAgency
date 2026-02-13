@@ -1,3 +1,5 @@
+import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
+import { InteractiveMap } from '@/app/components/InteractiveMap';
 import { Button } from '@/app/components/ui/button';
 import { Sparkles } from 'lucide-react';
 import { Page } from '@/app/App';
@@ -9,20 +11,20 @@ interface HeroProps {
 export function Hero({ setCurrentPage }: HeroProps) {
   return (
     <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Video */}
-      <div className="absolute inset-0 w-full h-full">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="w-full h-full object-cover pointer-events-none scale-[1.01]"
-        >
-          <source src="/images/video.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"></div>
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <ImageWithFallback
+          src="https://images.unsplash.com/photo-1689322375612-652dd0745c4f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3JvY2NvJTIwZGVzZXJ0JTIwc2FoYXJhJTIwc3Vuc2V0fGVufDF8fHx8MTc2OTcwMjI5NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+          alt="Moroccan Desert Sunset"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent"></div>
       </div>
+
+      {/* Decorative Pattern Overlay */}
+      <div className="absolute inset-0 opacity-10" style={{
+        backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(20, 184, 166, 0.3) 35px, rgba(20, 184, 166, 0.3) 70px)`
+      }}></div>
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-white">
@@ -71,6 +73,10 @@ export function Hero({ setCurrentPage }: HeroProps) {
         </div>
       </div>
 
+      {/* Hero Map Widget */}
+      <div className="hidden xl:block absolute bottom-8 right-8 w-[400px] z-20">
+        <InteractiveMap variant="hero" />
+      </div>
     </section>
   );
 }
