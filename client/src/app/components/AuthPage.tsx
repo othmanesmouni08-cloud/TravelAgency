@@ -16,7 +16,7 @@ interface AuthPageProps {
 }
 
 export function AuthPage({ initialMode = 'login', onBackToHome, onLogin }: AuthPageProps) {
-    const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
+    const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>(initialMode);
     const [isLoading, setIsLoading] = useState(false);
 
     const [email, setEmail] = useState('');
@@ -54,6 +54,21 @@ export function AuthPage({ initialMode = 'login', onBackToHome, onLogin }: AuthP
             }
         } catch (err: any) {
             toast.error(err.message || 'Authentication failed');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleForgotSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        try {
+            await authApi.forgotPassword(email);
+            toast.success('Reset link sent to your email!');
+            setMode('login');
+        } catch (err: any) {
+            toast.error(err.message || 'Failed to send reset link');
         } finally {
             setIsLoading(false);
         }
@@ -111,7 +126,7 @@ export function AuthPage({ initialMode = 'login', onBackToHome, onLogin }: AuthP
                             <span className="font-bold text-white text-xl">L'Oriental</span>
                         </button>
                         <div className="text-sm font-bold text-cyan-400 uppercase tracking-widest">
-                            {mode === 'login' ? 'Welcome Back' : 'Get Started'}
+                            {mode === 'login' ? 'Welcome Back' : mode === 'signup' ? 'Get Started' : 'Reset Password'}
                         </div>
                     </div>
 
@@ -124,15 +139,17 @@ export function AuthPage({ initialMode = 'login', onBackToHome, onLogin }: AuthP
                             transition={{ duration: 0.3 }}
                         >
                             <h3 className="text-3xl font-bold text-white mb-2">
-                                {mode === 'login' ? 'Login to your account' : 'Create an account'}
+                                {mode === 'login' ? 'Login to your account' : mode === 'signup' ? 'Create an account' : 'Forgot your password?'}
                             </h3>
                             <p className="text-teal-100/60 mb-10">
                                 {mode === 'login'
                                     ? 'Enter your credentials to access your travel dashboard.'
-                                    : 'Start planning your dream trip to Eastern Morocco today.'}
+                                    : mode === 'signup'
+                                        ? 'Start planning your dream trip to Eastern Morocco today.'
+                                        : "Enter your email and we'll send you a link to reset your password."}
                             </p>
 
-                            <form onSubmit={handleSubmit} className="space-y-6">
+                            <form onSubmit={mode === 'forgot' ? handleForgotSubmit : handleSubmit} className="space-y-6">
                                 {mode === 'signup' && (
                                     <div className="space-y-2">
                                         <Label htmlFor="name">Full Name</Label>
@@ -164,28 +181,34 @@ export function AuthPage({ initialMode = 'login', onBackToHome, onLogin }: AuthP
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                        <Label htmlFor="password" className="text-teal-100/70">Password</Label>
-                                        {mode === 'login' && (
-                                            <button type="button" className="text-xs font-bold text-cyan-400 hover:text-cyan-300 transition uppercase tracking-wider">
-                                                Forgot password?
-                                            </button>
-                                        )}
+                                {mode !== 'forgot' && (
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-center">
+                                            <Label htmlFor="password" className="text-teal-100/70">Password</Label>
+                                            {mode === 'login' && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setMode('forgot')}
+                                                    className="text-xs font-bold text-cyan-400 hover:text-cyan-300 transition uppercase tracking-wider"
+                                                >
+                                                    Forgot password?
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="relative">
+                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-400" />
+                                            <Input
+                                                id="password"
+                                                type="password"
+                                                placeholder="••••••••"
+                                                className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-12 pl-12 rounded-xl focus:border-teal-500/50 transition-all"
+                                                required
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="relative">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-400" />
-                                        <Input
-                                            id="password"
-                                            type="password"
-                                            placeholder="••••••••"
-                                            className="bg-white/5 border-white/10 text-white placeholder:text-white/20 h-12 pl-12 rounded-xl focus:border-teal-500/50 transition-all"
-                                            required
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
+                                )}
 
                                 <Button
                                     type="submit"
@@ -199,7 +222,7 @@ export function AuthPage({ initialMode = 'login', onBackToHome, onLogin }: AuthP
                                         </span>
                                     ) : (
                                         <span className="flex items-center gap-2">
-                                            {mode === 'login' ? 'Sign In' : 'Create Account'}
+                                            {mode === 'login' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Send Reset Link'}
                                             <ArrowRight className="w-5 h-5" />
                                         </span>
                                     )}
@@ -227,12 +250,12 @@ export function AuthPage({ initialMode = 'login', onBackToHome, onLogin }: AuthP
                             </div>
 
                             <p className="mt-10 text-center text-sm text-teal-100/60">
-                                {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
+                                {mode === 'forgot' ? "Remember your password?" : mode === 'login' ? "Don't have an account?" : 'Already have an account?'}
                                 <button
-                                    onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+                                    onClick={() => setMode(mode === 'forgot' ? 'login' : (mode === 'login' ? 'signup' : 'login'))}
                                     className="ml-2 font-bold text-cyan-400 underline underline-offset-8 decoration-cyan-400/30 hover:text-cyan-300 transition-all uppercase tracking-widest text-xs"
                                 >
-                                    {mode === 'login' ? 'Sign up for free' : 'Log in here'}
+                                    {mode === 'forgot' ? 'Back to Login' : (mode === 'login' ? 'Sign up for free' : 'Log in here')}
                                 </button>
                             </p>
                         </motion.div>

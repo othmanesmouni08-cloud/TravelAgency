@@ -45,6 +45,13 @@ export const carApi = {
     },
 };
 
+export const paymentApi = {
+    checkout: async (data: { cart: any[], amount: number, customerName: string, paymentMethod: string }) => {
+        const response = await api.post('/payments/checkout', data);
+        return response.data;
+    }
+};
+
 export const authApi = {
     login: async (credentials: any) => {
         const response = await api.post('/auth/login', credentials);
@@ -60,6 +67,14 @@ export const authApi = {
     },
     getCurrentUser: async () => {
         const response = await api.get('/auth/me');
+        return response.data;
+    },
+    forgotPassword: async (email: string) => {
+        const response = await api.post('/auth/forgot-password', { email });
+        return response.data;
+    },
+    resetPassword: async (token: string, password: any) => {
+        const response = await api.post(`/auth/reset-password/${token}`, { password });
         return response.data;
     },
 };

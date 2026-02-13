@@ -5,6 +5,7 @@ import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { CreditCard, ShieldCheck, Lock, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { paymentApi } from '@/app/services/api';
 
 import { CartItem } from '@/app/App';
 
@@ -21,7 +22,7 @@ export function FinalPaymentPage({ onComplete, cart }: { onComplete: () => void;
     });
     const [isProcessing, setIsProcessing] = useState(false);
 
-    const handlePay = (e: React.FormEvent) => {
+    const handlePay = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.cardNumber || !formData.expiryDate || !formData.cvv || !formData.cardName) {
             toast.error('Please fill in all card details');
@@ -29,12 +30,23 @@ export function FinalPaymentPage({ onComplete, cart }: { onComplete: () => void;
         }
 
         setIsProcessing(true);
-        // Simulate payment processing
-        setTimeout(() => {
-            setIsProcessing(false);
-            toast.success('Payment Successful! Your booking is confirmed.');
+
+        try {
+            await paymentApi.checkout({
+                cart,
+                amount: total,
+                customerName: formData.cardName,
+                paymentMethod: 'credit_card'
+            });
+
+            toast.success('Payment Successful! Your booking is confirmed and saved.');
             onComplete();
-        }, 2000);
+        } catch (error: any) {
+            console.error('Payment Error:', error);
+            toast.error(error.message || 'Payment failed. Please try again.');
+        } finally {
+            setIsProcessing(false);
+        }
     };
 
     return (

@@ -5,7 +5,7 @@ const { generateToken } = require('../../utils/generateToken');
 
 // Register
 exports.register = asyncHandler(async (req, res) => {
-  const { email, password,number, role } = req.body;
+  const { email, password, number, role } = req.body;
 
   const result = await authService.registerUser({
     email,
@@ -77,4 +77,27 @@ exports.oauthCallback = asyncHandler(async (req, res) => {
   // Redirect to frontend with token
   const frontend_url = process.env.FRONTEND_URL || 'http://localhost:3000';
   res.redirect(`${frontend_url}/auth-success?token=${accessToken}`);
+});
+
+// Forgot password
+exports.forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  await authService.forgotPassword(email);
+
+  res.status(200).json(
+    new ApiResponse(200, {}, 'Password reset email sent successfully')
+  );
+});
+
+// Reset password
+exports.resetPassword = asyncHandler(async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  await authService.resetPassword(token, password);
+
+  res.status(200).json(
+    new ApiResponse(200, {}, 'Password reset successfully')
+  );
 });
