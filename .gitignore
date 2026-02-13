@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 node_modules
 
 # Environment variables
@@ -56,3 +57,7 @@ out/
 .aws/
 .ssh/
 credentials.json
+=======
+node_modules/
+.env
+>>>>>>> a5b3ad8 (updated frontend)
