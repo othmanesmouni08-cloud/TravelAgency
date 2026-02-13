@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 const Car = require("./carModel");
 const asyncHandler = require("../../utils/asyncHandler");
 const ApiResponse = require("../../utils/ApiResponse");
@@ -16,26 +15,6 @@ exports.getOneCar = asyncHandler(async (req, res) => {
   if (!car) throw new ApiError(404, "Car not found");
   res.status(200).json(new ApiResponse(200, car, "Car retrieved successfully"));
 });
-=======
-const fs = require("fs");
-// Import the cars "model" (array of cars)
-const Car = require("./carModel");
-
-// Controller #1: Return all cars
-exports.getAllCars = (_, res) => {
-  // Send the list of cars as a JSON response
-  Car.find({})
-    .then((cars) => res.json(cars))
-    .catch((error) => res.send("Error fetching cars: ", error));
-};
-
-// Controller #2: Return a simple profile message
-exports.getOneCar = (req, res) => {
-  Car.findOne({ id: +req.params.car })
-    .then((car) => res.json(car))
-    .catch((error) => res.send("Error fetching car: ", error));
-};
->>>>>>> Taoufiq
 
 exports.createCar = (req, res) => {
   const newCar = new Car(req.body);

@@ -1,13 +1,9 @@
 const User = require("../User/user.model");
 const ApiError = require("../../utils/ApiError");
 const bcrypt = require("bcrypt");
-<<<<<<< HEAD
 const crypto = require("crypto");
 const { generateToken, _verifyToken } = require("../../utils/generateToken");
 const sendEmail = require("../../utils/sendEmail");
-=======
-const { generateToken, _verifyToken } = require("../../utils/generateToken");
->>>>>>> Taoufiq
 
 // Register user
 exports.registerUser = async (userData) => {
@@ -45,11 +41,7 @@ exports.registerUser = async (userData) => {
 // Login user
 exports.loginUser = async (email, password) => {
   // Find user
-<<<<<<< HEAD
   const user = await User.findOne({ email }).select("+password");
-=======
-  const user = await User.findOne({ email })
->>>>>>> Taoufiq
   if (!user) {
     throw new ApiError(401, "Invalid email or password");
   }
@@ -110,7 +102,6 @@ exports.changePassword = async (userId, oldPassword, newPassword) => {
   return { message: "Password changed successfully" };
 };
 
-<<<<<<< HEAD
 // Forgot password
 exports.forgotPassword = async (email) => {
   const user = await User.findOne({ email });
@@ -175,6 +166,4 @@ exports.resetPassword = async (resetToken, newPassword) => {
   return { message: "Password reset successfully" };
 };
 
-=======
->>>>>>> Taoufiq
 // module.exports handled by individual exports
