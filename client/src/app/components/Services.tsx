@@ -42,7 +42,6 @@ export function Services({ setCurrentPage }: ServicesProps) {
   };
 
   return (
-<<<<<<< HEAD
     <section id="services" className="py-20 bg-background relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
@@ -59,18 +58,6 @@ export function Services({ setCurrentPage }: ServicesProps) {
           </div>
           <h2 className="text-4xl md:text-5xl mb-4 text-white">Everything You Need for Your Journey</h2>
           <p className="text-xl text-teal-100/60 max-w-2xl mx-auto">
-=======
-    <section id="services" className="py-20 bg-gradient-to-b from-white to-cyan-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="w-5 h-5 text-teal-600" />
-            <span className="text-teal-600 uppercase tracking-wider">Our Services</span>
-            <Sparkles className="w-5 h-5 text-teal-600" />
-          </div>
-          <h2 className="text-4xl md:text-5xl mb-4 text-teal-900">Everything You Need for Your Journey</h2>
-          <p className="text-xl text-teal-700 max-w-2xl mx-auto">
->>>>>>> Taoufiq
             We provide comprehensive services to make your Eastern Morocco adventure seamless and unforgettable
           </p>
         </div>
@@ -79,30 +66,17 @@ export function Services({ setCurrentPage }: ServicesProps) {
           {services.map((service, index) => {
             const Icon = service.icon;
             return (
-<<<<<<< HEAD
               <Card key={index} className="group hover:shadow-2xl transition-all duration-500 border-white/5 bg-white/5 backdrop-blur-sm overflow-hidden">
-=======
-              <Card key={index} className="group hover:shadow-2xl transition-all duration-300 border-teal-200 overflow-hidden">
->>>>>>> Taoufiq
                 <div className="relative h-64 overflow-hidden">
                   <ImageWithFallback
                     src={service.image}
                     alt={service.title}
-<<<<<<< HEAD
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent"></div>
                   <div className="absolute bottom-4 left-4 right-4">
                     <div className="flex items-center gap-3 mb-2">
                       <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center shadow-lg shadow-teal-500/20">
-=======
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-12 h-12 bg-teal-500 rounded-lg flex items-center justify-center">
->>>>>>> Taoufiq
                         <Icon className="w-6 h-6 text-white" />
                       </div>
                       <h3 className="text-2xl text-white">{service.title}</h3>
@@ -110,30 +84,18 @@ export function Services({ setCurrentPage }: ServicesProps) {
                   </div>
                 </div>
                 <CardContent className="p-6">
-<<<<<<< HEAD
                   <p className="text-teal-100/70 mb-4">{service.description}</p>
                   <ul className="space-y-2 mb-6">
                     {service.features.map((feature, idx) => (
                       <li key={idx} className="flex items-center gap-2 text-teal-100/60">
                         <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full"></span>
-=======
-                  <p className="text-teal-800 mb-4">{service.description}</p>
-                  <ul className="space-y-2 mb-6">
-                    {service.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center gap-2 text-teal-700">
-                        <span className="w-1.5 h-1.5 bg-teal-500 rounded-full"></span>
->>>>>>> Taoufiq
                         {feature}
                       </li>
                     ))}
                   </ul>
                   <Button
                     onClick={() => handleViewService(service.page)}
-<<<<<<< HEAD
                     className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white hover:from-teal-600 hover:to-cyan-700 border-none shadow-lg shadow-teal-500/10"
-=======
-                    className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white hover:from-teal-600 hover:to-cyan-700"
->>>>>>> Taoufiq
                   >
                     View All Options
                   </Button>

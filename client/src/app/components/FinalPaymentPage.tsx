@@ -5,10 +5,7 @@ import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { CreditCard, ShieldCheck, Lock, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
-<<<<<<< HEAD
 import { paymentApi } from '@/app/services/api';
-=======
->>>>>>> Taoufiq
 
 import { CartItem } from '@/app/App';
 
@@ -25,11 +22,7 @@ export function FinalPaymentPage({ onComplete, cart }: { onComplete: () => void;
     });
     const [isProcessing, setIsProcessing] = useState(false);
 
-<<<<<<< HEAD
     const handlePay = async (e: React.FormEvent) => {
-=======
-    const handlePay = (e: React.FormEvent) => {
->>>>>>> Taoufiq
         e.preventDefault();
         if (!formData.cardNumber || !formData.expiryDate || !formData.cvv || !formData.cardName) {
             toast.error('Please fill in all card details');
@@ -37,7 +30,6 @@ export function FinalPaymentPage({ onComplete, cart }: { onComplete: () => void;
         }
 
         setIsProcessing(true);
-<<<<<<< HEAD
 
         try {
             await paymentApi.checkout({
@@ -71,82 +63,40 @@ export function FinalPaymentPage({ onComplete, cart }: { onComplete: () => void;
                     <div className="text-center mb-16">
                         <h1 className="text-4xl md:text-6xl text-white font-bold mb-6 tracking-tight">Complete Your Payment</h1>
                         <p className="text-xl text-teal-100/60 max-w-2xl mx-auto">Secure checkout for your Eastern Morocco adventure</p>
-=======
-        // Simulate payment processing
-        setTimeout(() => {
-            setIsProcessing(false);
-            toast.success('Payment Successful! Your booking is confirmed.');
-            onComplete();
-        }, 2000);
-    };
-
-    return (
-        <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white pt-32 pb-20">
-            <div className="container mx-auto px-4">
-                <div className="max-w-4xl mx-auto">
-                    {/* Header */}
-                    <div className="text-center mb-12">
-                        <h1 className="text-4xl md:text-5xl text-teal-900 mb-4">Complete Your Payment</h1>
-                        <p className="text-lg text-teal-700">Secure checkout for your Eastern Morocco adventure</p>
->>>>>>> Taoufiq
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
                         {/* Payment Form */}
                         <div className="md:col-span-2">
-<<<<<<< HEAD
                             <Card className="bg-white/5 backdrop-blur-xl border-white/10 overflow-hidden shadow-2xl">
                                 <CardHeader className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white border-b border-white/5">
                                     <CardTitle className="flex items-center gap-2 font-bold uppercase tracking-wider text-sm">
                                         <Lock className="w-5 h-5" />
                                         Secure Payment Layer
-=======
-                            <Card className="border-teal-200">
-                                <CardHeader className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white">
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Lock className="w-5 h-5" />
-                                        Secure Payment
->>>>>>> Taoufiq
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-8">
                                     <form onSubmit={handlePay} className="space-y-6">
-<<<<<<< HEAD
                                         <div className="space-y-6">
                                             <div className="space-y-3">
                                                 <Label htmlFor="cardName" className="text-teal-100/70 text-sm font-medium">Name on Card</Label>
-=======
-                                        <div className="space-y-4">
-                                            <div>
-                                                <Label htmlFor="cardName">Name on Card</Label>
->>>>>>> Taoufiq
                                                 <Input
                                                     id="cardName"
                                                     value={formData.cardName}
                                                     onChange={(e) => setFormData({ ...formData, cardName: e.target.value })}
                                                     placeholder="JOHN DOE"
-<<<<<<< HEAD
                                                     className="bg-white/5 border-white/10 text-white h-14 rounded-xl focus:border-teal-500/50 transition-all font-bold tracking-wider placeholder:text-white/10"
                                                     required
                                                 />
                                             </div>
                                             <div className="space-y-3">
                                                 <Label htmlFor="cardNumber" className="text-teal-100/70 text-sm font-medium">Card Number</Label>
-=======
-                                                    className="border-teal-200"
-                                                    required
-                                                />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor="cardNumber">Card Number</Label>
->>>>>>> Taoufiq
                                                 <div className="relative">
                                                     <Input
                                                         id="cardNumber"
                                                         value={formData.cardNumber}
                                                         onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
                                                         placeholder="**** **** **** ****"
-<<<<<<< HEAD
                                                         className="bg-white/5 border-white/10 text-white h-14 rounded-xl focus:border-teal-500/50 transition-all font-mono text-lg pl-12 placeholder:text-white/10"
                                                         required
                                                     />
@@ -156,37 +106,17 @@ export function FinalPaymentPage({ onComplete, cart }: { onComplete: () => void;
                                             <div className="grid grid-cols-2 gap-8">
                                                 <div className="space-y-3">
                                                     <Label htmlFor="expiryDate" className="text-teal-100/70 text-sm font-medium">Expiry Date</Label>
-=======
-                                                        className="border-teal-200 pr-10"
-                                                        required
-                                                    />
-                                                    <CreditCard className="absolute right-3 top-2.5 w-5 h-5 text-teal-400" />
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <Label htmlFor="expiryDate">Expiry Date</Label>
->>>>>>> Taoufiq
                                                     <Input
                                                         id="expiryDate"
                                                         value={formData.expiryDate}
                                                         onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
                                                         placeholder="MM/YY"
-<<<<<<< HEAD
                                                         className="bg-white/5 border-white/10 text-white h-14 rounded-xl focus:border-teal-500/50 transition-all font-mono text-lg text-center placeholder:text-white/10"
                                                         required
                                                     />
                                                 </div>
                                                 <div className="space-y-3">
                                                     <Label htmlFor="cvv" className="text-teal-100/70 text-sm font-medium">CVV</Label>
-=======
-                                                        className="border-teal-200"
-                                                        required
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <Label htmlFor="cvv">CVV</Label>
->>>>>>> Taoufiq
                                                     <Input
                                                         id="cvv"
                                                         type="password"
@@ -194,32 +124,21 @@ export function FinalPaymentPage({ onComplete, cart }: { onComplete: () => void;
                                                         value={formData.cvv}
                                                         onChange={(e) => setFormData({ ...formData, cvv: e.target.value })}
                                                         placeholder="***"
-<<<<<<< HEAD
                                                         className="bg-white/5 border-white/10 text-white h-14 rounded-xl focus:border-teal-500/50 transition-all font-mono text-lg text-center placeholder:text-white/10"
-=======
-                                                        className="border-teal-200"
->>>>>>> Taoufiq
                                                         required
                                                     />
                                                 </div>
                                             </div>
                                         </div>
 
-<<<<<<< HEAD
                                         <div className="flex items-center gap-4 p-6 bg-white/5 rounded-2xl border border-white/5 text-sm text-teal-100/60">
                                             <ShieldCheck className="w-10 h-10 text-cyan-400 flex-shrink-0" />
                                             <p className="leading-relaxed">Your payment information is encrypted and processed securely. We never store your full card details.</p>
-=======
-                                        <div className="flex items-center gap-4 p-4 bg-teal-50 rounded-lg text-sm text-teal-700">
-                                            <ShieldCheck className="w-8 h-8 text-teal-600 flex-shrink-0" />
-                                            <p>Your payment information is encrypted and processed securely. We never store your full card details.</p>
->>>>>>> Taoufiq
                                         </div>
 
                                         <Button
                                             type="submit"
                                             disabled={isProcessing}
-<<<<<<< HEAD
                                             className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-xl font-bold h-16 rounded-xl shadow-xl shadow-teal-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
                                         >
                                             {isProcessing ? (
@@ -228,11 +147,6 @@ export function FinalPaymentPage({ onComplete, cart }: { onComplete: () => void;
                                                     Processing...
                                                 </span>
                                             ) : `Pay ${total} MAD & Confirm`}
-=======
-                                            className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white text-lg h-12"
-                                        >
-                                            {isProcessing ? 'Processing...' : 'Pay Now & Confirm Booking'}
->>>>>>> Taoufiq
                                         </Button>
                                     </form>
                                 </CardContent>
@@ -241,7 +155,6 @@ export function FinalPaymentPage({ onComplete, cart }: { onComplete: () => void;
 
                         {/* Order Summary Sidebar */}
                         <div>
-<<<<<<< HEAD
                             <Card className="bg-white/5 backdrop-blur-md border-white/10 sticky top-24 overflow-hidden shadow-2xl">
                                 <CardHeader className="bg-white/5 border-b border-white/5">
                                     <CardTitle className="text-sm font-bold text-cyan-400 uppercase tracking-widest">Order Summary</CardTitle>
@@ -285,48 +198,6 @@ export function FinalPaymentPage({ onComplete, cart }: { onComplete: () => void;
                                                 <CheckCircle2 className="w-4 h-4 text-cyan-400" />
                                                 Secure Transaction
                                             </div>
-=======
-                            <Card className="border-teal-200 sticky top-24">
-                                <CardHeader className="bg-teal-50">
-                                    <CardTitle className="text-lg text-teal-900">Order Summary</CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-6">
-                                    <div className="space-y-4">
-                                        {cart.map((item) => (
-                                            <div key={item.id} className="flex justify-between items-start text-sm">
-                                                <div className="text-teal-700">
-                                                    <p className="font-medium">{item.name}</p>
-                                                    <p className="text-[10px] uppercase opacity-60">{item.type}</p>
-                                                </div>
-                                                <span className="text-teal-900 font-medium">{item.price} MAD</span>
-                                            </div>
-                                        ))}
-                                        <div className="border-t border-teal-100 pt-3">
-                                            <div className="flex justify-between items-start text-sm">
-                                                <span className="text-teal-700">Subtotal</span>
-                                                <span className="text-teal-900">{subtotal} MAD</span>
-                                            </div>
-                                            <div className="flex justify-between items-start text-sm">
-                                                <span className="text-teal-700">Service Charge</span>
-                                                <span className="text-teal-900">{serviceCharge} MAD</span>
-                                            </div>
-                                        </div>
-                                        <div className="border-t border-teal-100 pt-4">
-                                            <div className="flex justify-between items-center mb-6">
-                                                <span className="text-lg font-bold text-teal-900">Total</span>
-                                                <span className="text-2xl font-bold text-teal-900">{total} MAD</span>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <p className="text-xs text-teal-600 flex items-center gap-2">
-                                                <CheckCircle2 className="w-3 h-3" />
-                                                Instant Confirmation
-                                            </p>
-                                            <p className="text-xs text-teal-600 flex items-center gap-2">
-                                                <CheckCircle2 className="w-3 h-3" />
-                                                Secure Transaction
-                                            </p>
->>>>>>> Taoufiq
                                         </div>
                                     </div>
                                 </CardContent>
