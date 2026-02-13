@@ -1,7 +1,9 @@
 const User = require("../User/user.model");
 const ApiError = require("../../utils/ApiError");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const { generateToken, _verifyToken } = require("../../utils/generateToken");
+const sendEmail = require("../../utils/sendEmail");
 
 // Register user
 exports.registerUser = async (userData) => {
@@ -98,6 +100,70 @@ exports.changePassword = async (userId, oldPassword, newPassword) => {
   await user.save();
 
   return { message: "Password changed successfully" };
+};
+
+// Forgot password
+exports.forgotPassword = async (email) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(404, "There is no user with that email");
+  }
+
+  // Get reset token
+  const resetToken = user.getResetPasswordToken();
+
+  await user.save({ validateBeforeSave: false });
+
+  // Create reset url
+  const frontend_url = process.env.FRONTEND_URL || "http://localhost:5173";
+  const resetUrl = `${frontend_url}/reset-password/${resetToken}`;
+
+  const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please go to the following link to reset your password: \n\n ${resetUrl}`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Password reset token",
+      message,
+    });
+
+    return { message: "Email sent" };
+  } catch (err) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save({ validateBeforeSave: false });
+
+    throw new ApiError(500, "Email could not be sent");
+  }
+};
+
+// Reset password
+exports.resetPassword = async (resetToken, newPassword) => {
+  // Get hashed token
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new ApiError(400, "Invalid or expired token");
+  }
+
+  // Set new password
+  user.password = await bcrypt.hash(newPassword, 10);
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+
+  await user.save();
+
+  return { message: "Password reset successfully" };
 };
 
 // module.exports handled by individual exports

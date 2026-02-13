@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/app/components/Header';
 import { Hero } from '@/app/components/Hero';
 import { Services } from '@/app/components/Services';
@@ -18,8 +18,9 @@ import { AnimatePresence, motion } from 'motion/react';
 import { FinalPaymentPage } from '@/app/components/FinalPaymentPage';
 import { BasketPage } from './components/BasketPage';
 import { AdminDashboard } from './components/AdminDashboard';
+import { ResetPasswordPage } from './components/ResetPasswordPage';
 
-export type Page = 'home' | 'cars' | 'hotels' | 'activities' | 'book' | 'customize' | 'login' | 'signup' | 'payment' | 'basket' | 'admin';
+export type Page = 'home' | 'cars' | 'hotels' | 'activities' | 'book' | 'customize' | 'login' | 'signup' | 'payment' | 'basket' | 'admin' | 'reset-password';
 
 export interface CartItem {
   id: string;
@@ -54,6 +55,17 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [resetToken, setResetToken] = useState<string | null>(null);
+
+  // Simple routing for reset password
+  useEffect(() => {
+    const path = window.location.pathname;
+    const resetMatch = path.match(/\/reset-password\/(.+)/);
+    if (resetMatch) {
+      setResetToken(resetMatch[1]);
+      setCurrentPage('reset-password');
+    }
+  }, []);
 
   const handleLogin = (user: User) => {
     setCurrentUser(user);
@@ -136,6 +148,17 @@ export default function App() {
               />
             )}
             {currentPage === 'admin' && <AdminDashboard />}
+
+            {currentPage === 'reset-password' && (
+              <ResetPasswordPage
+                token={resetToken || ''}
+                onResetSuccess={() => {
+                  setResetToken(null);
+                  setCurrentPage('login');
+                  window.history.pushState({}, '', '/');
+                }}
+              />
+            )}
 
             {(currentPage === 'login' || currentPage === 'signup') && (
               <AuthPage
