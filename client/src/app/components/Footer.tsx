@@ -18,12 +18,10 @@ export function Footer({ setCurrentPage, currentUser }: FooterProps) {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* Company Info */}
           <div>
-            <button onClick={() => handleNavClick('home')} className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-teal-500 rounded-lg flex items-center justify-center">
-                <span className="text-white text-xl">✦</span>
-              </div>
-              <div className="text-left">
-                <h3 className="text-xl">Oriental Morocco</h3>
+            <button onClick={() => handleNavClick('home')} className="flex items-center gap-0 mb-4">
+              <img src="/images/logo.png" alt="Oriental Hub Logo" className="w-28 h-28 object-contain" />
+              <div className="text-left -ml-4">
+                <h3 className="text-xl">Oriental Hub</h3>
                 <p className="text-xs text-cyan-200">Travel Agency</p>
               </div>
             </button>
@@ -119,14 +117,14 @@ export function Footer({ setCurrentPage, currentUser }: FooterProps) {
             </div>
             <p className="text-sm text-cyan-200">
               Share your journey with<br />
-              #OrientalMorocco
+              #OrientalHub
             </p>
           </div>
         </div>
 
         <div className="border-t border-teal-800 pt-8 text-center">
           <p className="text-cyan-200 text-sm">
-            © 2026 Oriental Morocco Travel Agency. All rights reserved.
+            © 2026 Oriental Hub. All rights reserved.
           </p>
           <p className="text-cyan-300 text-xs mt-2">
             Licensed by Moroccan Tourism Board • Registration No. MA-12345

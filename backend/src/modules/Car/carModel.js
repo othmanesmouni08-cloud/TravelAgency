@@ -7,6 +7,7 @@ const carSchema = new mongoose.Schema({
   transmission: { type: String },
   pricePerDay: { type: Number, required: true },
   available: { type: Boolean, default: true },
+  type: { type: String }, // e.g. Economy, SUV
   imageUrl: { type: String }, // Optional: URL to car image
 });
 

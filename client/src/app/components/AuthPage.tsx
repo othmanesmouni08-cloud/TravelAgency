@@ -32,6 +32,10 @@ export function AuthPage({ initialMode = 'login', onBackToHome, onLogin }: AuthP
                 // The backend returns an ApiResponse object where the data is in response.data
                 const userData = response.data?.user || response.user;
 
+                if (response.accessToken) {
+                    localStorage.setItem('token', response.accessToken);
+                }
+
                 if (userData) {
                     onLogin({
                         email: userData.email || email,

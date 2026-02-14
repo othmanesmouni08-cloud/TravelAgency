@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -41,6 +41,8 @@ import {
     PackageForm,
     ServiceForm
 } from './admin/AdminForms';
+import { carApi } from '@/app/services/api';
+import { Switch } from '@/app/components/ui/switch';
 
 type AdminSection = 'overview' | 'hotels' | 'cars' | 'activities' | 'bookings' | 'packages' | 'services';
 
@@ -51,6 +53,23 @@ export function AdminDashboard() {
     const [editingItem, setEditingItem] = useState<{ id: string; data: any } | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+    // Load Cars on Mount
+    const [cars, setCars] = useState<any[]>([]);
+
+    useEffect(() => {
+        loadCars();
+    }, []);
+
+    const loadCars = async () => {
+        try {
+            const data = await carApi.getAll();
+            setCars(data);
+        } catch (error) {
+            console.error("Failed to load cars", error);
+            // toast.error("Failed to load cars"); // If you want generic error toast
+        }
+    };
+
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     const handleSectionChange = (section: AdminSection) => {
@@ -58,7 +77,7 @@ export function AdminDashboard() {
         setIsSidebarOpen(false);
     };
 
-    // Simulated Data
+    // Simulated Data for other sections
     const [hotels, setHotels] = useState([
         { id: 'h1', name: 'Riad Al-Oujda', location: 'Oujda Medina', price: 850, rating: 4.8, status: 'Active' },
         { id: 'h2', name: 'Figuig Oasis Resort', location: 'Figuig', price: 1200, rating: 4.9, status: 'Active' },
@@ -66,13 +85,8 @@ export function AdminDashboard() {
         { id: 'h4', name: 'Berkane Garden Riad', location: 'Berkane', price: 750, rating: 4.5, status: 'Active' },
     ]);
 
-    const [cars, setCars] = useState([
-        { id: 'c1', name: 'Dacia Logan', type: 'Economy', price: 250, seats: 5, transmission: 'Manual' },
-        { id: 'c2', name: 'Volkswagen Tiguan', type: 'Compact SUV', price: 450, seats: 5, transmission: 'Automatic' },
-        { id: 'c3', name: 'Range Rover Sport', type: '4x4 SUV', price: 650, seats: 7, transmission: 'Automatic' },
-        { id: 'c4', name: 'Mercedes-Benz S-Class', type: 'Luxury', price: 950, seats: 5, transmission: 'Automatic' },
-        { id: 'c5', name: 'Mercedes V-Class Chauffeur', type: 'Premium', price: 1500, seats: 4, transmission: 'Automatic' },
-    ]);
+    // Cars are now loaded from API
+    // const [cars, setCars] = useState([...]);
 
     const [activities, setActivities] = useState([
         { id: 'a1', title: 'Desert Safari', category: 'Adventure', price: 850, duration: '6 hours' },
@@ -97,43 +111,90 @@ export function AdminDashboard() {
         { id: 's2', title: 'Authentic Hotels & Riads', description: 'Stay in Eastern Morocco\'s finest accommodations...', image: 'https://images.unsplash.com/...', features: 'Traditional Riads, Beach Resorts', page: 'hotels' },
     ]);
 
-    const handleDelete = (id: string, section: AdminSection) => {
-        if (confirm('Are you sure you want to delete this item?')) {
-            if (section === 'hotels') setHotels(hotels.filter(h => h.id !== id));
-            if (section === 'cars') setCars(cars.filter(c => c.id !== id));
-            if (section === 'activities') setActivities(activities.filter(a => a.id !== id));
-            if (section === 'bookings') setBookings(bookings.filter(b => b.id !== id));
-            if (section === 'packages') setPackages(packages.filter(p => p.id !== id));
-            if (section === 'services') setServicesData(servicesData.filter(s => s.id !== id));
-            toast.success('Item deleted successfully');
+    const handleAvailabilityToggle = async (car: any) => {
+        try {
+            const updatedCar = { ...car, available: !car.available };
+            await carApi.update(car.id, updatedCar);
+            setCars(cars.map(c => c.id === car.id ? { ...c, available: !c.available } : c));
+            toast.success(`Car marked as ${updatedCar.available ? 'Available' : 'Unavailable'}`);
+        } catch (error) {
+            console.error("Failed to update availability", error);
+            toast.error("Failed to update availability");
         }
     };
 
-    const handleFormSubmit = (data: any) => {
-        if (editingItem) {
-            // Update
-            if (activeSection === 'hotels') setHotels(hotels.map(h => h.id === editingItem.id ? { ...h, ...data } : h));
-            if (activeSection === 'cars') setCars(cars.map(c => c.id === editingItem.id ? { ...c, ...data } : c));
-            if (activeSection === 'activities') setActivities(activities.map(a => a.id === editingItem.id ? { ...a, ...data } : a));
-            if (activeSection === 'packages') setPackages(packages.map(p => p.id === editingItem.id ? { ...p, ...data } : p));
-            if (activeSection === 'services') setServicesData(servicesData.map(s => s.id === editingItem.id ? { ...s, ...data } : s));
-            toast.success('Item updated successfully');
-        } else {
-            // Create
-            const id = Math.random().toString(36).substr(2, 9);
-            if (activeSection === 'hotels') setHotels([...hotels, { id, ...data }]);
-            if (activeSection === 'cars') setCars([...cars, { id, ...data }]);
-            if (activeSection === 'activities') setActivities([...activities, { id, ...data }]);
-            if (activeSection === 'packages') setPackages([...packages, { id, ...data }]);
-            if (activeSection === 'services') setServicesData([...servicesData, { id, ...data }]);
-            toast.success('Item added successfully');
+    const handleDelete = async (id: string, section: AdminSection) => {
+        if (confirm('Are you sure you want to delete this item?')) {
+            try {
+                if (section === 'hotels') setHotels(hotels.filter(h => h.id !== id));
+                if (section === 'cars') {
+                    await carApi.delete(id);
+                    loadCars();
+                }
+                if (section === 'activities') setActivities(activities.filter(a => a.id !== id));
+                if (section === 'bookings') setBookings(bookings.filter(b => b.id !== id));
+                if (section === 'packages') setPackages(packages.filter(p => p.id !== id));
+                if (section === 'services') setServicesData(servicesData.filter(s => s.id !== id));
+                toast.success('Item deleted successfully');
+            } catch (error) {
+                toast.error('Failed to delete item');
+            }
         }
-        setIsDialogOpen(false);
-        setEditingItem(null);
+    };
+
+    const handleFormSubmit = async (data: any) => {
+        console.log("handleFormSubmit called with:", data);
+        try {
+            if (editingItem) {
+                // Update
+                if (activeSection === 'hotels') {
+                    setHotels(hotels.map(h => h.id === editingItem.id ? { ...h, ...data } : h));
+                }
+                if (activeSection === 'cars') {
+                    console.log("Updating car...", editingItem.id);
+                    const carData = { ...data, pricePerDay: data.price };
+                    await carApi.update(editingItem.id, carData);
+                    console.log("Car updated via API");
+                    loadCars();
+                }
+                if (activeSection === 'activities') setActivities(activities.map(a => a.id === editingItem.id ? { ...a, ...data } : a));
+                if (activeSection === 'packages') setPackages(packages.map(p => p.id === editingItem.id ? { ...p, ...data } : p));
+                if (activeSection === 'services') setServicesData(servicesData.map(s => s.id === editingItem.id ? { ...s, ...data } : s));
+                toast.success('Item updated successfully');
+            } else {
+                // Create
+                const id = Math.random().toString(36).substr(2, 9);
+                if (activeSection === 'hotels') setHotels([...hotels, { id, ...data }]);
+                if (activeSection === 'cars') {
+                    console.log("Creating new car...");
+                    // Generate numeric ID for cars if needed by schema, or rely on backend. 
+                    // Schema says id: Number required.
+                    const newId = Math.floor(Math.random() * 1000000);
+                    const carData = { ...data, id: newId, pricePerDay: data.price };
+                    console.log("Payload:", carData);
+                    const result = await carApi.create(carData);
+                    console.log("Car created result:", result);
+                    loadCars();
+                }
+                if (activeSection === 'activities') setActivities([...activities, { id, ...data }]);
+                if (activeSection === 'packages') setPackages([...packages, { id, ...data }]);
+                if (activeSection === 'services') setServicesData([...servicesData, { id, ...data }]);
+                toast.success('Item added successfully');
+            }
+            setIsDialogOpen(false);
+            setEditingItem(null);
+        } catch (error: any) {
+            console.error("Form submit error", error);
+            toast.error(`Failed to save item: ${error.message || error}`);
+        }
     };
 
     const handleEdit = (item: any) => {
-        setEditingItem({ id: item.id, data: item });
+        let data = item;
+        if (activeSection === 'cars') {
+            data = { ...item, price: item.pricePerDay || item.price };
+        }
+        setEditingItem({ id: item.id, data });
         setIsDialogOpen(true);
     };
 
@@ -384,17 +445,27 @@ export function AdminDashboard() {
                                                         <th className="px-6 py-4">Price/Day</th>
                                                         <th className="px-6 py-4">Seats</th>
                                                         <th className="px-6 py-4">Transmission</th>
+                                                        <th className="px-6 py-4">Availability</th>
                                                         <th className="px-6 py-4 text-right">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-100">
-                                                    {cars.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase())).map(car => (
+                                                    {cars.filter(c => ((c.brand || '') + ' ' + (c.model || '')).toLowerCase().includes(searchQuery.toLowerCase())).map(car => (
                                                         <tr key={car.id} className="hover:bg-gray-50 transition">
-                                                            <td className="px-6 py-4 font-medium text-gray-900">{car.name}</td>
+                                                            <td className="px-6 py-4 font-medium text-gray-900">{car.brand} {car.model}</td>
                                                             <td className="px-6 py-4 text-gray-600">{car.type}</td>
-                                                            <td className="px-6 py-4 font-bold text-teal-900">{car.price} MAD</td>
+                                                            <td className="px-6 py-4 font-bold text-teal-900">{car.price || car.pricePerDay} MAD</td>
                                                             <td className="px-6 py-4 text-gray-500">{car.seats}</td>
                                                             <td className="px-6 py-4 text-gray-500">{car.transmission}</td>
+                                                            <td className="px-6 py-4">
+                                                                <div className="flex items-center gap-2">
+                                                                    <Switch
+                                                                        checked={car.available !== false} // Default to true if undefined
+                                                                        onCheckedChange={() => handleAvailabilityToggle(car)}
+                                                                    />
+                                                                    <span className="text-sm text-gray-500">{car.available !== false ? 'Available' : 'Unavailable'}</span>
+                                                                </div>
+                                                            </td>
                                                             <td className="px-6 py-4 text-right flex justify-end gap-2">
                                                                 <Button variant="ghost" size="icon" onClick={() => handleEdit(car)}><Edit3 className="w-4 h-4 text-teal-600" /></Button>
                                                                 <Button variant="ghost" size="icon" onClick={() => handleDelete(car.id, 'cars')}><Trash2 className="w-4 h-4 text-red-500" /></Button>

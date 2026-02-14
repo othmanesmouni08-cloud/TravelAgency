@@ -58,26 +58,38 @@ export function HotelForm({ onSubmit, initialData }: { onSubmit: (data: HotelFor
 
 // --- Cars ---
 export interface CarFormData {
-    name: string;
+    brand: string;
+    model: string;
     type: string;
     price: number;
     seats: number;
     transmission: 'Manual' | 'Automatic';
+    imageUrl?: string;
+    available?: boolean;
 }
 
 export function CarForm({ onSubmit, initialData }: { onSubmit: (data: CarFormData) => void, initialData?: CarFormData }) {
     const { register, handleSubmit, setValue, watch } = useForm<CarFormData>({
-        defaultValues: initialData || { transmission: 'Manual', seats: 5 }
+        defaultValues: initialData || { transmission: 'Manual', seats: 5, available: true }
     });
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-                <Label htmlFor="name">Car Model</Label>
-                <Input id="name" {...register('name', { required: true })} placeholder="e.g. Dacia Logan" />
+        <form onSubmit={handleSubmit(onSubmit, (errors) => {
+            console.error("CarForm Validation Errors:", errors);
+            alert(`Validation Error: ${JSON.stringify(errors)}`);
+        })} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="brand">Brand</Label>
+                    <Input id="brand" {...register('brand', { required: true })} placeholder="e.g. Dacia" />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="model">Model</Label>
+                    <Input id="model" {...register('model', { required: true })} placeholder="e.g. Logan" />
+                </div>
             </div>
             <div className="space-y-2">
-                <Label htmlFor="type">Type</Label>
+                <Label htmlFor="type">Type/Category</Label>
                 <Input id="type" {...register('type', { required: true })} placeholder="e.g. Economy, SUV" />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -101,6 +113,19 @@ export function CarForm({ onSubmit, initialData }: { onSubmit: (data: CarFormDat
                         <SelectItem value="Automatic">Automatic</SelectItem>
                     </SelectContent>
                 </Select>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="imageUrl">Image URL</Label>
+                <Input id="imageUrl" {...register('imageUrl')} placeholder="https://..." />
+            </div>
+            <div className="flex items-center space-x-2">
+                <input
+                    type="checkbox"
+                    id="available"
+                    {...register('available')}
+                    className="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                />
+                <Label htmlFor="available">Available for Booking</Label>
             </div>
             <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700">Save Car</Button>
         </form>
