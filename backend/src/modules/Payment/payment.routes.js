@@ -16,10 +16,10 @@ router.post('/', authenticate, validateCreatePayment, validate, paymentControlle
 
 // Cart Checkout
 router.post('/checkout', (req, res, next) => {
-  // Authentication is optional for checkout
+  // Authentication is optional for checkout if guest is allowed, 
+  // but let's check for user if token is present
   next();
 }, paymentController.processCheckout);
-
 // Get user payment history
 router.get('/', authenticate, paymentController.getUserPayments);
 

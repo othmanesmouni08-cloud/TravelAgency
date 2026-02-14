@@ -59,7 +59,6 @@ exports.updateStatus = asyncHandler(async (req, res) => {
     new ApiResponse(200, payment, 'Payment status updated successfully')
   );
 });
-
 /**
  * Process Cart Checkout
  */
