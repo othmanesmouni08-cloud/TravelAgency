@@ -1,6 +1,8 @@
 const { body } = require("express-validator");
 
 const validateRegister = [
+  body("firstName").notEmpty().withMessage("First name is required"),
+  body("lastName").notEmpty().withMessage("Last name is required"),
   body("email")
     .isEmail()
     .normalizeEmail()

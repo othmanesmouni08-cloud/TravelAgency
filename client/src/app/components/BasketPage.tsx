@@ -16,7 +16,7 @@ export function BasketPage({ cart, removeFromCart, onProceed }: BasketPageProps)
     const total = subtotal + serviceCharge;
     if (cart.length === 0) {
         return (
-            <div className="min-h-screen bg-[#030213] relative overflow-hidden pt-32 pb-20">
+            <div className="min-h-screen bg-[#030213] py-12 my-28 relative overflow-hidden pt-32 pb-20">
                 {/* Decorative background elements */}
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
                     <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-teal-500 rounded-full blur-[120px]"></div>

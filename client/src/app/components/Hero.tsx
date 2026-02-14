@@ -9,7 +9,7 @@ interface HeroProps {
 
 export function Hero({ setCurrentPage }: HeroProps) {
   return (
-    <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
+    <section id="home" className="my-20 relative h-screen flex items-center justify-center overflow-hidden">
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full">
         <video

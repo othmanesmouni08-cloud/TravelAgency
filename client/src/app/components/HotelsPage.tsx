@@ -81,7 +81,7 @@ export function HotelsPage({ addToCart, cart }: HotelsPageProps) {
     : safeHotels.filter(hotel => hotel.category === activeFilter);
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden pt-32 pb-20">
+    <div className="min-h-screen bg-background relative py-12 my-28 overflow-hidden pt-32 pb-20">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-teal-500 rounded-full blur-[120px]"></div>
