@@ -5,11 +5,12 @@ const { generateToken } = require('../../utils/generateToken');
 
 // Register
 exports.register = asyncHandler(async (req, res) => {
-  const { email, password, number, role } = req.body;
+  const { email, password, name, number, role } = req.body;
 
   const result = await authService.registerUser({
     email,
     password,
+    name,
     number,
     role
   });

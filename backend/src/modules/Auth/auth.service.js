@@ -7,7 +7,7 @@ const sendEmail = require("../../utils/sendEmail");
 
 // Register user
 exports.registerUser = async (userData) => {
-  const { email, password, role = "user" } = userData;
+  const { email, password, name, number, role = "user" } = userData;
 
   // Check if user already exists
   const existingUser = await User.findOne({ email });
@@ -22,6 +22,8 @@ exports.registerUser = async (userData) => {
   const user = await User.create({
     email,
     password: hashedPassword,
+    name,
+    phone: number,
     role,
   });
 
@@ -32,6 +34,8 @@ exports.registerUser = async (userData) => {
     user: {
       _id: user._id,
       email: user.email,
+      name: user.name,
+      phone: user.phone,
       role: user.role,
     },
     accessToken,
