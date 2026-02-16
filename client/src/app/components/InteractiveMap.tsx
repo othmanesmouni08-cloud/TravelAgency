@@ -4,11 +4,12 @@ import { Badge } from '@/app/components/ui/badge';
 import { MapPin, Navigation, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import type { Page } from '../App';
+import { SmallMapIcon } from './SmallMapIcon';
 
 
 
 interface InteractiveMapProps {
-  setCurrentPage?: (page: Page) => void;
+  setCurrentPage: (page: Page) => void;
 }
 
 export function InteractiveMap({ setCurrentPage }: InteractiveMapProps) {
@@ -115,59 +116,48 @@ export function InteractiveMap({ setCurrentPage }: InteractiveMapProps) {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="relative w-full" style={{ paddingBottom: '80%' }}>
+              <div className="relative w-full pb-30">
                 {/* Map Container */}
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 to-teal-50 overflow-hidden">
-
-                  {/* SVG Injection */}
-                  <div
-                    ref={mapRef}
-                    className="w-full h-full p-4"
-                    dangerouslySetInnerHTML={{ __html: svgContent }}
-                  />
-
-                  {/* Destination Markers Layer (Absolute Positioned over SVG) */}
-                  {/* Note: SVG ViewBox is 0 0 1000 1000. We map these to % positions */}
-
-
-                  {/* Locked Region Tooltip Overlay */}
-                  <AnimatePresence>
-                    {isHoveringLocked && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none"
-                      >
-                        <div className="bg-slate-800/90 backdrop-blur-sm text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 border border-slate-600">
-                          <Lock className="w-5 h-5 text-slate-400" />
-                          <span className="font-medium">Only L'Oriental region is available</span>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Legend */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-lg border border-teal-200 pointer-events-auto"
-                  >
-                    <h4 className="text-sm text-teal-900 mb-2">Legend</h4>
-                    <div className="space-y-2 text-xs">
-
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-teal-500/60 border border-teal-600"></div>
-                        <span className="text-teal-800">L'Oriental Region</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 bg-slate-400/20 border border-slate-300"></div>
-                        <span className="text-slate-500 italic">Other Regions Locked</span>
-                      </div>
-                    </div>
-                  </motion.div>
+                <div className="flex justify-center items-center">
+                  <SmallMapIcon setCurrentPage={setCurrentPage} />
                 </div>
+
+                <AnimatePresence>
+                  {isHoveringLocked && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none"
+                    >
+                      <div className="bg-slate-800/90 backdrop-blur-sm text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 border border-slate-600">
+                        <Lock className="w-5 h-5 text-slate-400" />
+                        <span className="font-medium">Only L'Oriental region is available</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Legend */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-lg border border-teal-200 pointer-events-auto"
+                >
+                  <h4 className="text-sm text-teal-900 mb-2">Legend</h4>
+                  <div className="space-y-2 text-xs">
+
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-teal-500/60 border border-teal-600"></div>
+                      <span className="text-teal-800">L'Oriental Region</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-slate-400/20 border border-slate-300"></div>
+                      <span className="text-slate-500 italic">Other Regions Locked</span>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
             </CardContent>
           </Card>

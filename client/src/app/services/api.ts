@@ -20,6 +20,18 @@ api.interceptors.response.use(
     }
 );
 
+// Request interceptor to add token
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
 export const activityApi = {
     getAll: async () => {
         const response = await api.get('/activities');
@@ -39,10 +51,22 @@ export const hotelApi = {
 };
 
 export const carApi = {
-    getAll: async () => {
-        const response = await api.get('/cars');
+    getAll: async (params?: { available?: boolean }) => {
+        const response = await api.get('/cars', { params });
         return response.data.data || response.data;
     },
+    create: async (data: any) => {
+        const response = await api.post('/cars', data);
+        return response.data;
+    },
+    update: async (id: string | number, data: any) => {
+        const response = await api.put(`/cars/${id}`, data);
+        return response.data;
+    },
+    delete: async (id: string | number) => {
+        const response = await api.delete(`/cars/${id}`);
+        return response.data;
+    }
 };
 
 export const paymentApi = {

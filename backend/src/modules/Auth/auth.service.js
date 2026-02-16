@@ -7,7 +7,7 @@ const sendEmail = require("../../utils/sendEmail");
 
 // Register user
 exports.registerUser = async (userData) => {
-  const { email, password, name, number, role = "user" } = userData;
+  const { firstName, lastName, email, password, role = "user" } = userData;
 
   // Check if user already exists
   const existingUser = await User.findOne({ email });
@@ -20,6 +20,8 @@ exports.registerUser = async (userData) => {
 
   // Create user
   const user = await User.create({
+    firstName,
+    lastName,
     email,
     password: hashedPassword,
     name,

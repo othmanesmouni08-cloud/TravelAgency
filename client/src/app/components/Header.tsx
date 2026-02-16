@@ -29,7 +29,7 @@ export function Header({ currentPage, setCurrentPage, cartCount, currentUser, on
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const isTransparent = currentPage === 'home' && !isScrolled && !isMenuOpen;
+    const isTransparent = currentPage === 'home' || currentPage === 'login' || currentPage === 'signup' && !isScrolled && !isMenuOpen;
 
     return (
         <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isTransparent
@@ -62,12 +62,10 @@ export function Header({ currentPage, setCurrentPage, cartCount, currentUser, on
 
                 {/* Main navigation */}
                 <div className="flex items-center justify-between py-4">
-                    <button onClick={() => handleNavClick('home')} className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center text-white">
-                            <span className="text-xl">✦</span>
-                        </div>
-                        <div className="text-left">
-                            <h1 className={`text-2xl font-bold leading-none transition-colors duration-300 ${isTransparent ? 'text-white' : 'text-white'}`}>Oriental Morocco</h1>
+                    <button onClick={() => handleNavClick('home')} className="flex items-center gap-0">
+                        <img src="/images/logo.png" alt="Oriental Hub Logo" className="w-28 h-28 object-contain" />
+                        <div className="text-left -ml-4">
+                            <h1 className={`text-2xl font-bold leading-none transition-colors duration-300 ${isTransparent ? 'text-white' : 'text-white'}`}>Oriental Hub</h1>
                             <p className={`text-xs transition-colors duration-300 ${isTransparent ? 'text-cyan-400' : 'text-cyan-400/80'}`}>Travel Agency</p>
                         </div>
                     </button>

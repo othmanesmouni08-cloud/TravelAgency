@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Hamsa Hand Outline -->
+  <path d="M50 95 C50 95 20 85 20 50 C20 35 25 25 30 25 C35 25 35 35 35 35 L35 15 C35 5 45 5 45 15 L45 35 L50 35 L55 35 L55 15 C55 5 65 5 65 15 L65 35 C65 35 70 25 75 25 C80 25 80 35 80 50 C80 85 50 95 50 95Z" fill="#ecfdf5" />
+  
+  <!-- Inner Circle for Compass -->
+  <circle cx="50" cy="55" r="18" stroke="#0891b2" stroke-width="1.5" fill="white" />
+  
+  <!-- Compass Needle Pointing East -->
+  <path d="M50 45 L55 55 L50 65 L45 55 Z" fill="#0d9488" />
+  <path d="M55 55 L70 55 L55 55 Z" stroke="#ef4444" stroke-width="2" /> <!-- East Pointer Red -->
+  
+  <!-- Compass Ticks -->
+  <path d="M50 37 L50 40" stroke="#0891b2" /> <!-- N -->
+  <path d="M50 70 L50 73" stroke="#0891b2" /> <!-- S -->
+  <path d="M37 55 L40 55" stroke="#0891b2" /> <!-- W -->
+  <path d="M70 55 L73 55" stroke="#0891b2" /> <!-- E -->
+</svg>

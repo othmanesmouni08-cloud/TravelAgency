@@ -32,6 +32,10 @@ export function AuthPage({ initialMode = 'login', onBackToHome, onLogin }: AuthP
                 // The backend returns an ApiResponse object where the data is in response.data
                 const userData = response.data?.user || response.user;
 
+                if (response.accessToken) {
+                    localStorage.setItem('token', response.accessToken);
+                }
+
                 if (userData) {
                     onLogin({
                         email: userData.email || email,
@@ -48,7 +52,9 @@ export function AuthPage({ initialMode = 'login', onBackToHome, onLogin }: AuthP
                 toast.success('Welcome back!');
             } else {
                 const name = (document.getElementById('name') as HTMLInputElement)?.value || email.split('@')[0];
-                await authApi.signup({ name, email, password });
+                const firstName = name.split(' ')[0];
+                const lastName = name.split(' ')[1];
+                await authApi.signup({ firstName, lastName, email, password });
                 setMode('login');
                 toast.success('Account created! Please sign in.');
             }
@@ -75,7 +81,7 @@ export function AuthPage({ initialMode = 'login', onBackToHome, onLogin }: AuthP
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
+        <div className="min-h-screen py-12 my-28 flex items-center justify-center bg-background p-4 relative overflow-hidden">
             {/* Decorative background elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-teal-500/10 rounded-full blur-[120px] animate-pulse"></div>
@@ -238,14 +244,10 @@ export function AuthPage({ initialMode = 'login', onBackToHome, onLogin }: AuthP
                                 </div>
                             </div>
 
-                            <div className="mt-8 grid grid-cols-2 gap-4">
-                                <Button variant="outline" className="h-12 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-white/20 group transition-all">
+                            <div className="mt-8 flex justify-center gap-4">
+                                <Button variant="outline" className="h-12 w-full rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-white/20 group transition-all">
                                     <Chrome className="w-5 h-5 mr-3 text-red-500 group-hover:scale-110 transition-transform" />
-                                    Google
-                                </Button>
-                                <Button variant="outline" className="h-12 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-white/20 group transition-all">
-                                    <Github className="w-5 h-5 mr-3 text-white group-hover:scale-110 transition-transform" />
-                                    GitHub
+                                    Google Login
                                 </Button>
                             </div>
 

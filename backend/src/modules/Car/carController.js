@@ -5,7 +5,12 @@ const ApiError = require("../../utils/ApiError");
 
 // Controller #1: Return all cars
 exports.getAllCars = asyncHandler(async (req, res) => {
-  const cars = await Car.find({});
+  const { available } = req.query;
+  const filter = {};
+  if (available !== undefined) {
+    filter.available = available === "true";
+  }
+  const cars = await Car.find(filter);
   res.status(200).json(new ApiResponse(200, cars, "Cars retrieved successfully"));
 });
 
