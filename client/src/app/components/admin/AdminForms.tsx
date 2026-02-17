@@ -74,7 +74,7 @@ export function CarForm({ onSubmit, initialData }: { onSubmit: (data: CarFormDat
     });
 
     return (
-        <form onSubmit={handleSubmit(onSubmit, (errors) => {
+        <form onSubmit={handleSubmit(onSubmit, (errors: any) => {
             console.error("CarForm Validation Errors:", errors);
             alert(`Validation Error: ${JSON.stringify(errors)}`);
         })} className="space-y-4">
@@ -134,10 +134,11 @@ export function CarForm({ onSubmit, initialData }: { onSubmit: (data: CarFormDat
 
 // --- Activities ---
 export interface ActivityFormData {
-    title: string;
-    category: string;
+    name: string;
+    Category: string;
     price: number;
     duration: string;
+    image_url?: string;
 }
 
 export function ActivityForm({ onSubmit, initialData }: { onSubmit: (data: ActivityFormData) => void, initialData?: ActivityFormData }) {
@@ -148,12 +149,12 @@ export function ActivityForm({ onSubmit, initialData }: { onSubmit: (data: Activ
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-                <Label htmlFor="title">Activity Title</Label>
-                <Input id="title" {...register('title', { required: true })} placeholder="e.g. Desert Safari" />
+                <Label htmlFor="name">Activity Title</Label>
+                <Input id="name" {...register('name', { required: true })} placeholder="e.g. Desert Safari" />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Input id="category" {...register('category', { required: true })} placeholder="e.g. Adventure, Culture" />
+                <Label htmlFor="Category">Category</Label>
+                <Input id="Category" {...register('Category', { required: true })} placeholder="e.g. Adventure, Culture" />
             </div>
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -164,6 +165,10 @@ export function ActivityForm({ onSubmit, initialData }: { onSubmit: (data: Activ
                     <Label htmlFor="duration">Duration</Label>
                     <Input id="duration" {...register('duration', { required: true })} placeholder="e.g. 4 hours" />
                 </div>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="image_url">Image URL</Label>
+                <Input id="image_url" {...register('image_url')} placeholder="https://..." />
             </div>
             <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700">Save Activity</Button>
         </form>

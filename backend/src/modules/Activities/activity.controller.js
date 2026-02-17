@@ -100,7 +100,7 @@ exports.updateActivity = async (req, res) => {
     const updatedActivity = await Activity.findOneAndUpdate(
       { id: activityId },
       req.body,
-      { new: true, runValidators: true },
+      { returnDocument: "after", runValidators: true },
     );
     if (!updatedActivity) {
       return res.status(404).json({ message: "Activity not found" });

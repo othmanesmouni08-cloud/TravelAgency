@@ -49,7 +49,7 @@ exports.updatePaymentStatus = async (paymentId, status) => {
   const payment = await Payment.findByIdAndUpdate(
     paymentId,
     { status },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   if (!payment) {

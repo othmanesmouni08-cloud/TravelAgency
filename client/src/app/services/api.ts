@@ -10,6 +10,27 @@ const api = axios.create({
     },
 });
 
+// Backend Hotel Interface (matches backend model)
+export interface BackendHotel {
+    _id?: string;
+    id: number;
+    name: string;
+    location: string;
+    image: string;
+    pricePerNight: number;
+    rating: number;
+    available: boolean;
+    features: string[];
+    services: {
+        name: string;
+        price: number;
+        type: 'food' | 'activity' | 'other';
+    }[];
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+
 // Response interceptor for better error handling
 api.interceptors.response.use(
     (response) => response,
@@ -41,6 +62,18 @@ export const activityApi = {
         const response = await api.get(`/activities/${id}`);
         return response.data.data || response.data;
     },
+    create: async (data: any) => {
+        const response = await api.post('/activities', data);
+        return response.data;
+    },
+    update: async (id: string | number, data: any) => {
+        const response = await api.put(`/activities/${id}`, data);
+        return response.data;
+    },
+    delete: async (id: string | number) => {
+        const response = await api.delete(`/activities/${id}`);
+        return response.data;
+    }
 };
 
 export const hotelApi = {
@@ -70,8 +103,12 @@ export const carApi = {
 };
 
 export const paymentApi = {
-    checkout: async (data: { cart: any[], amount: number, customerName: string, paymentMethod: string }) => {
+    checkout: async (data: { cart: any[], customerName: string, emailAddress: string, phoneNumber: string, specialRequest?: string, paymentMethod: string }) => {
         const response = await api.post('/payments/checkout', data);
+        return response.data.data; // Expected { clientSecret, paymentId, amount }
+    },
+    confirmPayment: async (data: { paymentIntentId: string, paymentId: string }) => {
+        const response = await api.post('/payments/confirm-payment', data);
         return response.data;
     }
 };
@@ -101,6 +138,27 @@ export const authApi = {
         const response = await api.post(`/auth/reset-password/${token}`, { password });
         return response.data;
     },
+};
+
+export const bookingApi = {
+    getAll: async () => {
+        const response = await api.get('/bookings');
+        console.log("Bookings API Response:", response); // Log the full response
+        // Handle cases where response.data is the array or response.data.data is the array
+        const data = Array.isArray(response.data) ? response.data : (response.data.data || []);
+        return data;
+    },
+    updateStatus: async (id: string, status: string) => {
+        const response = await api.put(`/bookings/${id}/status`, { status });
+        return response.data;
+    }
+};
+
+export const adminApi = {
+    getStats: async () => {
+        const response = await api.get('/admin/stats');
+        return response.data;
+    }
 };
 
 export default api;

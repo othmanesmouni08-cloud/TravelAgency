@@ -15,5 +15,7 @@ const bookingRoutes = require("../modules/Booking/bookingRoutes");
 router.use("/bookings", bookingRoutes);
 const activitiesRoutes = require("../modules/Activities/activity.routes");
 router.use("/activities", activitiesRoutes);
+const adminRoutes = require("../modules/Admin/admin.routes");
+router.use("/admin", adminRoutes);
 
 module.exports = router;

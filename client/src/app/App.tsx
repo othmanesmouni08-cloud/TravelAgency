@@ -142,7 +142,18 @@ export default function App() {
                 onProceed={() => setCurrentPage('book')}
               />
             )}
-            {currentPage === 'book' && <BookPage onProceedToPayment={() => setCurrentPage('payment')} />}
+            {currentPage === 'book' && (
+              <BookPage
+                onProceedToPayment={() => {
+                  if (!currentUser) {
+                    toast.error('Please log in to complete your purchase');
+                    setCurrentPage('login');
+                  } else {
+                    setCurrentPage('payment');
+                  }
+                }}
+              />
+            )}
             {currentPage === 'payment' && (
               <FinalPaymentPage
                 cart={cart}

@@ -30,6 +30,24 @@ const hotelSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    image: {
+      type: String,
+      default: "",
+    },
+    features: {
+      type: [String],
+      default: [],
+    },
+    services: [
+      {
+        name: String,
+        price: Number,
+        type: {
+          type: String,
+          enum: ["food", "activity", "other"],
+        },
+      },
+    ],
   },
   {
     timestamps: true,

@@ -1,51 +1,129 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
-import { Input } from '@/app/components/ui/input';
-import { Label } from '@/app/components/ui/label';
-import { CreditCard, ShieldCheck, Lock, CheckCircle2 } from 'lucide-react';
+import { Lock, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { paymentApi } from '@/app/services/api';
-
 import { CartItem } from '@/app/App';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+
+// Initialize Stripe
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+
+function CheckoutForm({ onComplete, total, customerName, paymentId }: { onComplete: () => void; total: number; customerName: string; paymentId: string }) {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [message, setMessage] = useState<string | null>(null);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!stripe || !elements) {
+            return;
+        }
+
+        setIsProcessing(true);
+
+        const { error, paymentIntent } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: window.location.origin,
+                payment_method_data: {
+                    billing_details: {
+                        name: customerName,
+                    }
+                }
+            },
+            redirect: 'if_required',
+        });
+
+        if (error) {
+            setMessage(error.message || 'An unexpected error occurred.');
+            toast.error(error.message || 'Payment failed.');
+            setIsProcessing(false);
+        } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+            // Confirm with our backend
+            try {
+                await paymentApi.confirmPayment({
+                    paymentIntentId: paymentIntent.id,
+                    paymentId
+                });
+                toast.success('Payment Successful! Your booking is pending approval.');
+                onComplete();
+            } catch (err) {
+                console.error('Backend confirmation failed', err);
+                // Even if backend fails here, Stripe succeeded. 
+                // We might want to show a specific message or just rely on webhook backup (if we had one).
+                // For now, let's treat it as success but log it.
+                toast.success('Payment processed. Booking pending approval.');
+                onComplete();
+            }
+            setIsProcessing(false);
+        } else {
+            setIsProcessing(false);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-6">
+            <PaymentElement />
+            {message && <div className="text-red-500 text-sm">{message}</div>}
+            <div className="flex items-center gap-4 p-6 bg-white/5 rounded-2xl border border-white/5 text-sm text-teal-100/60">
+                <ShieldCheck className="w-10 h-10 text-cyan-400 flex-shrink-0" />
+                <p className="leading-relaxed">Your payment information is encrypted and processed securely by Stripe.</p>
+            </div>
+            <Button
+                type="submit"
+                disabled={!stripe || isProcessing}
+                className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-xl font-bold h-16 rounded-xl shadow-xl shadow-teal-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
+                {isProcessing ? (
+                    <span className="flex items-center gap-2">
+                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        Processing...
+                    </span>
+                ) : `Pay ${total} MAD & Confirm`}
+            </Button>
+        </form>
+    );
+}
 
 export function FinalPaymentPage({ onComplete, cart }: { onComplete: () => void; cart: CartItem[] }) {
     const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
     const serviceCharge = cart.length > 0 ? 50 : 0;
     const total = subtotal + serviceCharge;
 
-    const [formData, setFormData] = useState({
-        cardNumber: '',
-        expiryDate: '',
-        cvv: '',
-        cardName: ''
-    });
-    const [isProcessing, setIsProcessing] = useState(false);
+    const [clientSecret, setClientSecret] = useState('');
+    const [paymentId, setPaymentId] = useState('');
+    const [customerName, setCustomerName] = useState('');
+    const [emailAddress, setEmailAddress] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [specialRequest, setSpecialRequest] = useState('');
+    const [initializing, setInitializing] = useState(false);
 
-    const handlePay = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!formData.cardNumber || !formData.expiryDate || !formData.cvv || !formData.cardName) {
-            toast.error('Please fill in all card details');
+    const initPayment = async () => {
+        if (!customerName || !emailAddress || !phoneNumber) {
+            toast.error('Please fill in all required fields');
             return;
         }
-
-        setIsProcessing(true);
-
+        setInitializing(true);
         try {
-            await paymentApi.checkout({
+            const data = await paymentApi.checkout({
                 cart,
-                amount: total,
-                customerName: formData.cardName,
-                paymentMethod: 'credit_card'
+                customerName,
+                emailAddress,
+                phoneNumber,
+                specialRequest,
+                paymentMethod: 'card'
             });
-
-            toast.success('Payment Successful! Your booking is confirmed and saved.');
-            onComplete();
+            setClientSecret(data.clientSecret);
+            setPaymentId(data.paymentId);
         } catch (error: any) {
-            console.error('Payment Error:', error);
-            toast.error(error.message || 'Payment failed. Please try again.');
+            toast.error('Failed to initialize payment');
         } finally {
-            setIsProcessing(false);
+            setInitializing(false);
         }
     };
 
@@ -76,79 +154,61 @@ export function FinalPaymentPage({ onComplete, cart }: { onComplete: () => void;
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-8">
-                                    <form onSubmit={handlePay} className="space-y-6">
+                                    {!clientSecret ? (
                                         <div className="space-y-6">
-                                            <div className="space-y-3">
-                                                <Label htmlFor="cardName" className="text-teal-100/70 text-sm font-medium">Name on Card</Label>
-                                                <Input
-                                                    id="cardName"
-                                                    value={formData.cardName}
-                                                    onChange={(e) => setFormData({ ...formData, cardName: e.target.value })}
-                                                    placeholder="JOHN DOE"
-                                                    className="bg-white/5 border-white/10 text-white h-14 rounded-xl focus:border-teal-500/50 transition-all font-bold tracking-wider placeholder:text-white/10"
-                                                    required
+                                            <div>
+                                                <label className="text-teal-100/70 text-sm font-medium block mb-3">Name on Card</label>
+                                                <input
+                                                    value={customerName}
+                                                    onChange={(e) => setCustomerName(e.target.value)}
+                                                    placeholder="Enter your name"
+                                                    className="w-full bg-white/5 border border-white/10 text-white h-14 rounded-xl px-4 focus:border-teal-500/50 transition-all font-bold tracking-wider placeholder:text-white/10 outline-none"
                                                 />
                                             </div>
-                                            <div className="space-y-3">
-                                                <Label htmlFor="cardNumber" className="text-teal-100/70 text-sm font-medium">Card Number</Label>
-                                                <div className="relative">
-                                                    <Input
-                                                        id="cardNumber"
-                                                        value={formData.cardNumber}
-                                                        onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
-                                                        placeholder="**** **** **** ****"
-                                                        className="bg-white/5 border-white/10 text-white h-14 rounded-xl focus:border-teal-500/50 transition-all font-mono text-lg pl-12 placeholder:text-white/10"
-                                                        required
-                                                    />
-                                                    <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-400" />
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-8">
-                                                <div className="space-y-3">
-                                                    <Label htmlFor="expiryDate" className="text-teal-100/70 text-sm font-medium">Expiry Date</Label>
-                                                    <Input
-                                                        id="expiryDate"
-                                                        value={formData.expiryDate}
-                                                        onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
-                                                        placeholder="MM/YY"
-                                                        className="bg-white/5 border-white/10 text-white h-14 rounded-xl focus:border-teal-500/50 transition-all font-mono text-lg text-center placeholder:text-white/10"
-                                                        required
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="text-teal-100/70 text-sm font-medium block mb-3">Email Address</label>
+                                                    <input
+                                                        type="email"
+                                                        value={emailAddress}
+                                                        onChange={(e) => setEmailAddress(e.target.value)}
+                                                        placeholder="name@example.com"
+                                                        className="w-full bg-white/5 border border-white/10 text-white h-14 rounded-xl px-4 focus:border-teal-500/50 transition-all font-medium placeholder:text-white/10 outline-none"
                                                     />
                                                 </div>
-                                                <div className="space-y-3">
-                                                    <Label htmlFor="cvv" className="text-teal-100/70 text-sm font-medium">CVV</Label>
-                                                    <Input
-                                                        id="cvv"
-                                                        type="password"
-                                                        maxLength={3}
-                                                        value={formData.cvv}
-                                                        onChange={(e) => setFormData({ ...formData, cvv: e.target.value })}
-                                                        placeholder="***"
-                                                        className="bg-white/5 border-white/10 text-white h-14 rounded-xl focus:border-teal-500/50 transition-all font-mono text-lg text-center placeholder:text-white/10"
-                                                        required
+                                                <div>
+                                                    <label className="text-teal-100/70 text-sm font-medium block mb-3">Phone Number</label>
+                                                    <input
+                                                        type="tel"
+                                                        value={phoneNumber}
+                                                        onChange={(e) => setPhoneNumber(e.target.value)}
+                                                        placeholder="+212 6..."
+                                                        className="w-full bg-white/5 border border-white/10 text-white h-14 rounded-xl px-4 focus:border-teal-500/50 transition-all font-medium placeholder:text-white/10 outline-none"
                                                     />
                                                 </div>
                                             </div>
+                                            <div>
+                                                <label className="text-teal-100/70 text-sm font-medium block mb-3">Special Request (Optional)</label>
+                                                <textarea
+                                                    value={specialRequest}
+                                                    onChange={(e) => setSpecialRequest(e.target.value)}
+                                                    placeholder="Any special requirements?"
+                                                    className="w-full bg-white/5 border border-white/10 text-white h-24 rounded-xl p-4 focus:border-teal-500/50 transition-all font-medium placeholder:text-white/10 outline-none resize-none"
+                                                />
+                                            </div>
+                                            <Button
+                                                onClick={initPayment}
+                                                disabled={initializing || !customerName || !emailAddress || !phoneNumber}
+                                                className="w-full bg-teal-600 hover:bg-teal-700 text-white py-6 text-lg rounded-xl"
+                                            >
+                                                {initializing ? 'Initializing...' : 'Proceed to Payment'}
+                                            </Button>
                                         </div>
-
-                                        <div className="flex items-center gap-4 p-6 bg-white/5 rounded-2xl border border-white/5 text-sm text-teal-100/60">
-                                            <ShieldCheck className="w-10 h-10 text-cyan-400 flex-shrink-0" />
-                                            <p className="leading-relaxed">Your payment information is encrypted and processed securely. We never store your full card details.</p>
-                                        </div>
-
-                                        <Button
-                                            type="submit"
-                                            disabled={isProcessing}
-                                            className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 text-white text-xl font-bold h-16 rounded-xl shadow-xl shadow-teal-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
-                                        >
-                                            {isProcessing ? (
-                                                <span className="flex items-center gap-2">
-                                                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                                                    Processing...
-                                                </span>
-                                            ) : `Pay ${total} MAD & Confirm`}
-                                        </Button>
-                                    </form>
+                                    ) : (
+                                        <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night', labels: 'floating' } }}>
+                                            <CheckoutForm onComplete={onComplete} total={total} customerName={customerName} paymentId={paymentId} />
+                                        </Elements>
+                                    )}
                                 </CardContent>
                             </Card>
                         </div>

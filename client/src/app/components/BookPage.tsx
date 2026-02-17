@@ -37,7 +37,7 @@ export function BookPage({ onProceedToPayment }: { onProceedToPayment: () => voi
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-500 rounded-full blur-[120px]"></div>
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 relative z-10 pt-20">
 
         {/* Header */}
         <div className="text-center mb-16">

@@ -29,7 +29,7 @@ export function Header({ currentPage, setCurrentPage, cartCount, currentUser, on
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const isTransparent = currentPage === 'home' || currentPage === 'login' || currentPage === 'signup' && !isScrolled && !isMenuOpen;
+    const isTransparent = (currentPage === 'home' || currentPage === 'login' || currentPage === 'signup') && !isScrolled && !isMenuOpen;
 
     return (
         <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isTransparent
@@ -53,10 +53,10 @@ export function Header({ currentPage, setCurrentPage, cartCount, currentUser, on
                         <Phone className="w-4 h-4" />
                         +212 123 456 789
                     </a>
-                    <a href="mailto:info@moroccotravel.com" className={`flex items-center gap-2 text-sm transition-colors duration-300 ${isTransparent ? 'text-white hover:text-cyan-400' : 'text-teal-100/70 hover:text-cyan-400'
+                    <a href="mailto:info@orientalhub.com" className={`flex items-center gap-2 text-sm transition-colors duration-300 ${isTransparent ? 'text-white hover:text-cyan-400' : 'text-teal-100/70 hover:text-cyan-400'
                         }`}>
                         <Mail className="w-4 h-4" />
-                        info@moroccotravel.com
+                        info@orientalhub.com
                     </a>
                 </div>
 

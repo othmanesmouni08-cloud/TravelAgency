@@ -56,7 +56,7 @@ const updateHotel = async (hotelId, updateData) => {
   const hotel = await Hotel.findOneAndUpdate(
     { id: Number(hotelId) },
     updateData,
-    { new: true, runValidators: true },
+    { returnDocument: 'after', runValidators: true },
   );
 
   if (!hotel) {

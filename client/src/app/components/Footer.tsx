@@ -87,8 +87,8 @@ export function Footer({ setCurrentPage, currentUser }: FooterProps) {
               </li>
               <li className="flex items-start gap-2">
                 <Mail className="w-4 h-4 mt-1 text-cyan-400" />
-                <a href="mailto:info@moroccotravel.com" className="text-sm text-cyan-200 hover:text-white">
-                  info@moroccotravel.com
+                <a href="mailto:info@orientalhub.com" className="text-sm text-cyan-200 hover:text-white">
+                  info@orientalhub.com
                 </a>
               </li>
               <li className="flex items-start gap-2">

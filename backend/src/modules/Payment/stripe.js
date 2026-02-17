@@ -2,7 +2,7 @@ const { STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET } = require('../../config/env')
 const stripe = require('stripe')(STRIPE_SECRET_KEY);
 const ApiError = require('../../utils/ApiError');
 
- 
+
 exports.createPaymentIntent = async (amount, currency = 'usd', customerId, metadata = {}) => {
   try {
     const paymentIntentData = {
@@ -22,6 +22,14 @@ exports.createPaymentIntent = async (amount, currency = 'usd', customerId, metad
     return paymentIntent;
   } catch (error) {
     throw new ApiError(400, `Stripe error: ${error.message}`);
+  }
+};
+
+exports.retrievePaymentIntent = async (paymentIntentId) => {
+  try {
+    return await stripe.paymentIntents.retrieve(paymentIntentId);
+  } catch (error) {
+    throw new ApiError(400, `Stripe retrieve error: ${error.message}`);
   }
 };
 
@@ -51,7 +59,7 @@ exports.createCustomer = async (email, metadata = {}) => {
 };
 
 
- 
+
 exports.createRefund = async (chargeId, amount = null, reason = 'requested_by_customer') => {
   try {
     const refundData = {
