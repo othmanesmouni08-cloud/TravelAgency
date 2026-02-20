@@ -117,16 +117,24 @@ export function Header({ currentPage, setCurrentPage, cartCount, currentUser, on
 
                         <div className={`flex items-center gap-4 border-l pl-8 ml-2 transition-colors duration-300 ${isTransparent ? 'border-white/20' : 'border-teal-100'}`}>
                             {currentUser ? (
-                                <Button
-                                    onClick={onLogout}
-                                    variant="outline"
-                                    className={`transition-colors duration-300 ${isTransparent
-                                        ? 'border-white/40 text-white hover:bg-white/10'
-                                        : 'border-white/20 text-white hover:bg-white/5'
-                                        }`}
-                                >
-                                    Log Out
-                                </Button>
+                                <>
+                                    <button
+                                        onClick={() => handleNavClick('my-bookings')}
+                                        className={`font-medium transition ${isTransparent ? 'text-white hover:text-cyan-400' : 'text-teal-100/70 hover:text-cyan-400'}`}
+                                    >
+                                        My Bookings
+                                    </button>
+                                    <Button
+                                        onClick={onLogout}
+                                        variant="outline"
+                                        className={`transition-colors duration-300 ${isTransparent
+                                            ? 'border-white/40 text-white hover:bg-white/10'
+                                            : 'border-white/20 text-white hover:bg-white/5'
+                                            }`}
+                                    >
+                                        Log Out
+                                    </Button>
+                                </>
                             ) : (
                                 <>
                                     <button
@@ -194,6 +202,15 @@ export function Header({ currentPage, setCurrentPage, cartCount, currentUser, on
                                     className={`text-left transition font-bold ${currentPage === 'admin' ? 'text-teal-600' : 'text-teal-900 hover:text-teal-600'}`}
                                 >
                                     Backoffice
+                                </button>
+                            )}
+
+                            {currentUser && (
+                                <button
+                                    onClick={() => handleNavClick('my-bookings')}
+                                    className={`text-left transition font-medium ${currentPage === 'my-bookings' ? 'text-teal-600' : 'text-teal-900 hover:text-teal-600'}`}
+                                >
+                                    My Bookings
                                 </button>
                             )}
 

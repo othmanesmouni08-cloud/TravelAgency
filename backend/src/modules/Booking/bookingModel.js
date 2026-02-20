@@ -16,9 +16,10 @@ const bookingSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ["pending", "confirmed", "completed", "cancelled"],
+      enum: ["pending", "confirmed", "completed", "cancelled", "cancellation_requested", "change_requested"],
       default: "pending",
     },
+    changeRequestDetails: { type: String },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
     paymentId: { type: mongoose.Schema.Types.ObjectId, ref: "Payment" },

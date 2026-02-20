@@ -174,7 +174,7 @@ exports.updateBookingStatus = async (req, res) => {
         await item.save();
       }
     } else if (status === 'cancelled') {
-      if (item && booking.status === 'confirmed') {
+      if (item && (booking.status === 'confirmed' || booking.status === 'cancellation_requested' || booking.status === 'change_requested')) {
         // Only make available if it was confirmed (and thus made unavailable)
         item.available = true;
         await item.save();
@@ -188,5 +188,95 @@ exports.updateBookingStatus = async (req, res) => {
   } catch (error) {
     console.error("Error updating booking status:", error);
     res.status(500).json({ message: "Error updating booking status", error: error.message });
+  }
+};
+
+exports.getMyBookings = async (req, res) => {
+  try {
+    const customerId = req.user?.userId;
+    if (!customerId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const bookings = await Booking.find({ customerId }).sort({ createdAt: -1 });
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error("Error fetching user bookings:", error);
+    res.status(500).json({ message: "Error fetching your bookings", error: error.message });
+  }
+};
+
+exports.requestCancellation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const customerId = req.user?.userId;
+
+    if (!customerId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const booking = await Booking.findById(id);
+    console.log("requestCancellation => id:", id, "customerId:", customerId, "Found booking:", booking);
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    if (booking.customerId?.toString() !== customerId) {
+      console.log("Permission Error: booking.customerId is", booking.customerId, "but req customerId is", customerId);
+      return res.status(403).json({ message: "You don't have permission to modify this booking." });
+    }
+
+    if (!['pending', 'confirmed'].includes(booking.status)) {
+      return res.status(400).json({ message: `Cannot request cancellation for booking with status ${booking.status}` });
+    }
+
+    booking.status = "cancellation_requested";
+    await booking.save();
+
+    res.status(200).json({ message: "Cancellation request submitted", booking });
+  } catch (error) {
+    console.error("Error submitting cancellation request:", error);
+    res.status(500).json({ message: "Error submitting cancellation request", error: error.message });
+  }
+};
+
+exports.requestChange = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { changeDetails } = req.body;
+    const customerId = req.user?.userId;
+
+    if (!customerId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!changeDetails) {
+      return res.status(400).json({ message: "Change details are required" });
+    }
+
+    const booking = await Booking.findById(id);
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    // Explicit check
+    if (booking.customerId?.toString() !== customerId) {
+      console.log("Permission Error: booking.customerId is", booking.customerId, "but req customerId is", customerId);
+      return res.status(403).json({ message: "You don't have permission to modify this booking." });
+    }
+
+    if (!['pending', 'confirmed'].includes(booking.status)) {
+      return res.status(400).json({ message: `Cannot request change for booking with status ${booking.status}` });
+    }
+
+    booking.status = "change_requested";
+    booking.changeRequestDetails = changeDetails;
+    await booking.save();
+
+    res.status(200).json({ message: "Change request submitted", booking });
+  } catch (error) {
+    console.error("Error submitting change request:", error);
+    res.status(500).json({ message: "Error submitting change request", error: error.message });
   }
 };

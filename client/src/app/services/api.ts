@@ -148,8 +148,21 @@ export const bookingApi = {
         const data = Array.isArray(response.data) ? response.data : (response.data.data || []);
         return data;
     },
+    getMyBookings: async () => {
+        const response = await api.get('/bookings/my-bookings');
+        const data = Array.isArray(response.data) ? response.data : (response.data.data || []);
+        return data;
+    },
     updateStatus: async (id: string, status: string) => {
         const response = await api.put(`/bookings/${id}/status`, { status });
+        return response.data;
+    },
+    requestCancellation: async (id: string) => {
+        const response = await api.put(`/bookings/${id}/request-cancel`);
+        return response.data;
+    },
+    requestChange: async (id: string, changeDetails: string) => {
+        const response = await api.put(`/bookings/${id}/request-change`, { changeDetails });
         return response.data;
     }
 };

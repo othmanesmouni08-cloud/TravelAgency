@@ -19,8 +19,9 @@ import { FinalPaymentPage } from '@/app/components/FinalPaymentPage';
 import { BasketPage } from './components/BasketPage';
 import { AdminDashboard } from './components/AdminDashboard';
 import { ResetPasswordPage } from './components/ResetPasswordPage';
+import { MyBookingsPage } from '@/app/components/MyBookingsPage';
 
-export type Page = 'home' | 'cars' | 'hotels' | 'activities' | 'book' | 'customize' | 'login' | 'signup' | 'payment' | 'basket' | 'admin' | 'reset-password';
+export type Page = 'home' | 'cars' | 'hotels' | 'activities' | 'book' | 'customize' | 'login' | 'signup' | 'payment' | 'basket' | 'admin' | 'reset-password' | 'my-bookings';
 
 export interface CartItem {
   id: string;
@@ -164,6 +165,7 @@ export default function App() {
               />
             )}
             {currentPage === 'admin' && <AdminDashboard />}
+            {currentPage === 'my-bookings' && <MyBookingsPage setCurrentPage={setCurrentPage} />}
 
             {currentPage === 'reset-password' && (
               <ResetPasswordPage

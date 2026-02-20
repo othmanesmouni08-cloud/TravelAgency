@@ -650,14 +650,18 @@ export function AdminDashboard() {
                                                             <td className="px-6 py-4">
                                                                 <Badge className={
                                                                     booking.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-                                                                        booking.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                                                                            'bg-red-100 text-red-700'
+                                                                        (booking.status === 'cancellation_requested' || booking.status === 'change_requested') ? 'bg-purple-100 text-purple-700' :
+                                                                            booking.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                                                                                'bg-red-100 text-red-700'
                                                                 }>
-                                                                    {booking.status}
+                                                                    {booking.status.replace('_', ' ')}
                                                                 </Badge>
+                                                                {booking.changeRequestDetails && (
+                                                                    <div className="text-xs text-gray-500 mt-1 max-w-xs">{booking.changeRequestDetails}</div>
+                                                                )}
                                                             </td>
                                                             <td className="px-6 py-4 text-right flex justify-end gap-2">
-                                                                {booking.status === 'pending' && (
+                                                                {(booking.status === 'pending' || booking.status === 'change_requested') && (
                                                                     <>
                                                                         <Button variant="ghost" size="sm" onClick={() => handleBookingStatus(booking._id, 'confirmed')} className="text-green-600 hover:text-green-800 hover:bg-green-50">
                                                                             Confirm
@@ -667,7 +671,7 @@ export function AdminDashboard() {
                                                                         </Button>
                                                                     </>
                                                                 )}
-                                                                {booking.status === 'confirmed' && (
+                                                                {(booking.status === 'confirmed' || booking.status === 'cancellation_requested') && (
                                                                     <Button variant="ghost" size="sm" onClick={() => handleBookingStatus(booking._id, 'cancelled')} className="text-red-500 hover:text-red-700 hover:bg-red-50">
                                                                         Cancel
                                                                     </Button>
