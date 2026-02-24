@@ -36,7 +36,7 @@ exports.updateCar = (req, res) => {
   Car.findOneAndUpdate(
     { id: +req.params.id },
     { $set: req.body },
-    { new: true },
+    { returnDocument: "after" },
   )
     .then((car) => {
       if (car) return res.json({ message: "Car updated successfully", car });

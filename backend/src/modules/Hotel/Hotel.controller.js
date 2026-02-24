@@ -7,7 +7,7 @@ const hotelService = require("./Hotel.service");
 
 // POST /api/hotels - Create a new hotel
 const createHotel = asyncHandler(async (req, res) => {
-  const { id, name, location, pricePerNight, rating, available } = req.body;
+  const { id, name, location, pricePerNight, rating, available, image, features, services } = req.body;
 
   // Validate required fields
   if (!name || !location || pricePerNight === undefined) {
@@ -21,6 +21,9 @@ const createHotel = asyncHandler(async (req, res) => {
     pricePerNight,
     rating,
     available,
+    image,
+    features,
+    services,
   });
 
   console.log(`🏨 Hotel Created: ${hotel.name} in ${hotel.location}`);
@@ -44,6 +47,8 @@ const getAllHotels = asyncHandler(async (req, res) => {
 
   const hotels = await hotelService.getAllHotels(filters);
 
+
+
   res
     .status(200)
     .json(new ApiResponse(200, hotels, `Found ${hotels.length} hotel(s)`));
@@ -62,10 +67,24 @@ const getHotelById = asyncHandler(async (req, res) => {
 
 // PUT /api/hotels/:id - Update a hotel
 const updateHotel = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const updateData = req.body;
+  const { id: paramId } = req.params;
+  const { name, location, pricePerNight, rating, available, image, features, services } = req.body;
 
-  const hotel = await hotelService.updateHotel(id, updateData);
+  const updateData = {
+    name,
+    location,
+    pricePerNight,
+    rating,
+    available,
+    image,
+    features,
+    services,
+  };
+
+  // Remove undefined fields to avoid overwriting with null/undefined if not provided
+  Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+
+  const hotel = await hotelService.updateHotel(paramId, updateData);
 
   res
     .status(200)

@@ -86,7 +86,7 @@ export function CustomizePage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="flex items-center justify-center gap-2 mb-4 pt-26">
             <Sparkles className="w-6 h-6 text-cyan-400" />
             <span className="text-cyan-400 uppercase tracking-wider">Plan Your Adventure</span>
             <Sparkles className="w-6 h-6 text-cyan-400" />

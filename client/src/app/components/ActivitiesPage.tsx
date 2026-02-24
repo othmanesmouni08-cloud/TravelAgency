@@ -7,6 +7,16 @@ import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
 import { toast } from 'sonner';
 import { activityApi } from '@/app/services/api';
 import { CartItem } from '@/app/App';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/app/components/ui/dialog";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
 
 interface Activity {
   id: string | number;
@@ -57,6 +67,11 @@ export function ActivitiesPage({ addToCart, cart }: ActivitiesPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Date selection state
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [date, setDate] = useState<string>('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   useEffect(() => {
     const fetchActivities = async () => {
       try {
@@ -75,20 +90,37 @@ export function ActivitiesPage({ addToCart, cart }: ActivitiesPageProps) {
     fetchActivities();
   }, []);
 
-  const toggleActivity = (activity: Activity) => {
+  const initiateAddActivity = (activity: Activity) => {
     if (cart.some(item => String(item.id) === String(activity.id) && item.type === 'activity')) {
       toast.info('This activity is already in your basket');
       return;
     }
-    const category = activity.category || activity.Category || 'Experience';
+    setSelectedActivity(activity);
+    setDate(''); // Reset date
+    setIsDialogOpen(true);
+  };
+
+  const confirmAddActivity = () => {
+    if (!selectedActivity) return;
+    if (!date) {
+      toast.error("Please select a date for your activity");
+      return;
+    }
+
+    const category = selectedActivity.category || selectedActivity.Category || 'Experience';
     addToCart({
-      id: String(activity.id),
-      name: activity.name,
-      price: activity.price,
+      id: String(selectedActivity.id),
+      name: selectedActivity.name,
+      price: selectedActivity.price,
       type: 'activity',
-      image: getImagePath(activity),
-      details: `${activity.duration}, ${category}`
+      image: getImagePath(selectedActivity),
+      details: `${selectedActivity.duration}, ${category}`,
+      startDate: date, // Add selected date
+      endDate: date, // Single day activity
     });
+
+    setIsDialogOpen(false);
+    setSelectedActivity(null);
   };
 
   return (
@@ -206,7 +238,7 @@ export function ActivitiesPage({ addToCart, cart }: ActivitiesPageProps) {
                   </div>
 
                   <Button
-                    onClick={() => toggleActivity(activity)}
+                    onClick={() => initiateAddActivity(activity)}
                     disabled={activity.available === false}
                     className={`w-full ${isAdded
                       ? 'bg-teal-100 text-teal-800'
@@ -237,6 +269,47 @@ export function ActivitiesPage({ addToCart, cart }: ActivitiesPageProps) {
           </Card>
         </div>
       </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="bg-[#0f172a] border-white/10 text-white sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Select Date</DialogTitle>
+            <DialogDescription className="text-teal-100/60">
+              Pick a date for your {selectedActivity?.name} experience.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="date" className="text-white">Date</Label>
+              <Input
+                id="date"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="col-span-3 bg-white/5 border-white/10 text-white [color-scheme:dark]"
+                min={new Date().toISOString().split('T')[0]} // Disable past dates
+              />
+            </div>
+          </div>
+          <DialogFooter className="sm:justify-end gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setIsDialogOpen(false)}
+              className="text-teal-100 hover:text-white hover:bg-white/10"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={confirmAddActivity}
+              className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white hover:from-teal-600 hover:to-cyan-700"
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

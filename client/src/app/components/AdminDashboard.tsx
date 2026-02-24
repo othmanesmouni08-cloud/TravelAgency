@@ -41,7 +41,7 @@ import {
     PackageForm,
     ServiceForm
 } from './admin/AdminForms';
-import { carApi } from '@/app/services/api';
+import { carApi, adminApi, bookingApi, activityApi } from '@/app/services/api';
 import { Switch } from '@/app/components/ui/switch';
 
 type AdminSection = 'overview' | 'hotels' | 'cars' | 'activities' | 'bookings' | 'packages' | 'services';
@@ -56,9 +56,43 @@ export function AdminDashboard() {
     // Load Cars on Mount
     const [cars, setCars] = useState<any[]>([]);
 
+    // Load Activities on Mount
+    const [activities, setActivities] = useState<any[]>([]);
+
+    const [dashboardStats, setDashboardStats] = useState({
+        totalRevenue: 0,
+        newBookings: 0,
+        activeListings: 0,
+        happyCustomers: 0,
+        alerts: [] as any[]
+    });
+
     useEffect(() => {
         loadCars();
+        loadActivities();
+        loadStats();
     }, []);
+
+    const loadActivities = async () => {
+        try {
+            const data = await activityApi.getAll();
+            setActivities(Array.isArray(data) ? data : (data?.data && Array.isArray(data.data) ? data.data : []));
+        } catch (error) {
+            console.error("Failed to load activities", error);
+        }
+    };
+
+    const loadStats = async () => {
+        try {
+            const response = await adminApi.getStats();
+            if (response.success) {
+                setDashboardStats(response.data);
+            }
+        } catch (error) {
+            console.error("Failed to load admin stats", error);
+            toast.error("Failed to load dashboard statistics");
+        }
+    };
 
     const loadCars = async () => {
         try {
@@ -88,17 +122,26 @@ export function AdminDashboard() {
     // Cars are now loaded from API
     // const [cars, setCars] = useState([...]);
 
-    const [activities, setActivities] = useState([
-        { id: 'a1', title: 'Desert Safari', category: 'Adventure', price: 850, duration: '6 hours' },
-        { id: 'a2', title: 'Oujda City Tour', category: 'Culture', price: 350, duration: '4 hours' },
-        { id: 'a3', title: 'Cooking Class', category: 'Food', price: 450, duration: '3 hours' },
-    ]);
+    // Activities are now loaded from API
+    // const [activities, setActivities] = useState([...]);
 
-    const [bookings, setBookings] = useState([
-        { id: 'b1', customer: 'Sarah Johnson', item: 'Riad Al-Oujda', date: 'Oct 24, 2026', amount: '4,250 MAD', status: 'Confirmed' },
-        { id: 'b2', customer: 'Marc Durand', item: '4x4 Atlas Explorer', date: 'Oct 23, 2026', amount: '1,200 MAD', status: 'Pending' },
-        { id: 'b3', customer: 'Yassine Benali', item: 'Desert Safari Tour', date: 'Oct 23, 2026', amount: '850 MAD', status: 'Confirmed' },
-    ]);
+    const [bookings, setBookings] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (activeSection === 'bookings') {
+            loadBookings();
+        }
+    }, [activeSection]);
+
+    const loadBookings = async () => {
+        try {
+            const data = await bookingApi.getAll();
+            setBookings(data);
+        } catch (error) {
+            console.error("Failed to load bookings", error);
+            // toast.error("Failed to load bookings");
+        }
+    };
 
     const [packages, setPackages] = useState([
         { id: 'p1', name: 'Oujda', description: 'The gateway to Eastern Morocco with beautiful architecture and vibrant culture', image: 'https://images.unsplash.com/photo-1716302235543-5517c070ad35?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3JvY2NvJTIwb3VqZGElMjBjaXR5JTIwYXJjaGl0ZWN0dXJlfGVufDF8fHx8MTc2OTcwMjU2N3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral', rating: 4.7, highlights: 'Historic Medina, French Architecture, Local Markets' },
@@ -123,6 +166,30 @@ export function AdminDashboard() {
         }
     };
 
+    const handleActivityAvailabilityToggle = async (activity: any) => {
+        try {
+            const updatedActivity = { ...activity, available: !activity.available };
+            await activityApi.update(activity.id, updatedActivity);
+            setActivities(activities.map(a => a.id === activity.id ? { ...a, available: !a.available } : a));
+            toast.success(`Activity marked as ${updatedActivity.available ? 'Available' : 'Unavailable'}`);
+        } catch (error) {
+            console.error("Failed to update activity availability", error);
+            toast.error("Failed to update activity availability");
+        }
+    };
+
+    const handleBookingStatus = async (id: string, status: string) => {
+        try {
+            await bookingApi.updateStatus(id, status);
+            toast.success(`Booking ${status}`);
+            loadBookings();
+            loadStats(); // Reload stats to update revenue/counts
+        } catch (error) {
+            console.error("Failed to update booking status", error);
+            toast.error("Failed to update booking status");
+        }
+    };
+
     const handleDelete = async (id: string, section: AdminSection) => {
         if (confirm('Are you sure you want to delete this item?')) {
             try {
@@ -131,8 +198,17 @@ export function AdminDashboard() {
                     await carApi.delete(id);
                     loadCars();
                 }
-                if (section === 'activities') setActivities(activities.filter(a => a.id !== id));
-                if (section === 'bookings') setBookings(bookings.filter(b => b.id !== id));
+                if (section === 'activities') {
+                    await activityApi.delete(id);
+                    loadActivities();
+                }
+                if (section === 'bookings') {
+                    // For now, let's say delete is cancel, or just remove from view if needed.
+                    // But user asked for status update. Let's keep delete separate if exists.
+                    // The backend delete isn't implemented for bookings yet, so maybe just UI delete?
+                    // I will implement status update buttons instead of delete for bookings in the table.
+                    setBookings(bookings.filter(b => b._id !== id));
+                }
                 if (section === 'packages') setPackages(packages.filter(p => p.id !== id));
                 if (section === 'services') setServicesData(servicesData.filter(s => s.id !== id));
                 toast.success('Item deleted successfully');
@@ -157,7 +233,10 @@ export function AdminDashboard() {
                     console.log("Car updated via API");
                     loadCars();
                 }
-                if (activeSection === 'activities') setActivities(activities.map(a => a.id === editingItem.id ? { ...a, ...data } : a));
+                if (activeSection === 'activities') {
+                    await activityApi.update(editingItem.id, data);
+                    loadActivities();
+                }
                 if (activeSection === 'packages') setPackages(packages.map(p => p.id === editingItem.id ? { ...p, ...data } : p));
                 if (activeSection === 'services') setServicesData(servicesData.map(s => s.id === editingItem.id ? { ...s, ...data } : s));
                 toast.success('Item updated successfully');
@@ -176,7 +255,11 @@ export function AdminDashboard() {
                     console.log("Car created result:", result);
                     loadCars();
                 }
-                if (activeSection === 'activities') setActivities([...activities, { id, ...data }]);
+                if (activeSection === 'activities') {
+                    const newId = Math.floor(Math.random() * 1000000);
+                    await activityApi.create({ ...data, id: newId });
+                    loadActivities();
+                }
                 if (activeSection === 'packages') setPackages([...packages, { id, ...data }]);
                 if (activeSection === 'services') setServicesData([...servicesData, { id, ...data }]);
                 toast.success('Item added successfully');
@@ -199,10 +282,10 @@ export function AdminDashboard() {
     };
 
     const stats = [
-        { title: 'Total Revenue', value: '128,450 MAD', icon: CreditCard, change: '+12.5%', color: 'border-teal-500' },
-        { title: 'New Bookings', value: '42', icon: LayoutDashboard, change: '+8.2%', color: 'border-cyan-500' },
-        { title: 'Active Listings', value: '24', icon: Package, change: '0%', color: 'border-teal-600' },
-        { title: 'Happy Customers', value: '1,250', icon: Users, change: '+15.3%', color: 'border-cyan-600' },
+        { title: 'Total Revenue', value: `${dashboardStats.totalRevenue.toLocaleString()} MAD`, icon: CreditCard, change: '', color: 'border-teal-500' },
+        { title: 'New Bookings', value: dashboardStats.newBookings.toString(), icon: LayoutDashboard, change: '', color: 'border-cyan-500' },
+        { title: 'Active Listings', value: dashboardStats.activeListings.toString(), icon: Package, change: '', color: 'border-teal-600' },
+        { title: 'Happy Customers', value: dashboardStats.happyCustomers.toString(), icon: Users, change: '', color: 'border-cyan-600' },
     ];
 
     return (
@@ -341,14 +424,19 @@ export function AdminDashboard() {
                                 </CardHeader>
                                 <CardContent className="p-6">
                                     <div className="space-y-4">
-                                        <div className="flex items-center gap-4 p-4 bg-teal-50 rounded-lg">
-                                            <div className="w-2 h-2 rounded-full bg-teal-500" />
-                                            <p className="text-sm text-teal-900 font-medium">New booking from Sarah Johnson needs confirmation.</p>
-                                        </div>
-                                        <div className="flex items-center gap-4 p-4 bg-amber-50 rounded-lg">
-                                            <div className="w-2 h-2 rounded-full bg-amber-500" />
-                                            <p className="text-sm text-amber-900 font-medium">Inventory alert: Economy cars running low for Saïdia.</p>
-                                        </div>
+                                        {dashboardStats.alerts.length > 0 ? (
+                                            dashboardStats.alerts.map((alert, index) => (
+                                                <div key={index} className={`flex items-center gap-4 p-4 rounded-lg ${alert.type === 'inventory' ? 'bg-amber-50' : 'bg-teal-50'
+                                                    }`}>
+                                                    <div className={`w-2 h-2 rounded-full ${alert.type === 'inventory' ? 'bg-amber-500' : 'bg-teal-500'
+                                                        }`} />
+                                                    <p className={`text-sm font-medium ${alert.type === 'inventory' ? 'text-amber-900' : 'text-teal-900'
+                                                        }`}>{alert.message}</p>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500 text-center py-4">No important alerts</p>
+                                        )}
                                     </div>
                                 </CardContent>
                             </Card>
@@ -484,16 +572,26 @@ export function AdminDashboard() {
                                                         <th className="px-6 py-4">Category</th>
                                                         <th className="px-6 py-4">Price</th>
                                                         <th className="px-6 py-4">Duration</th>
+                                                        <th className="px-6 py-4">Availability</th>
                                                         <th className="px-6 py-4 text-right">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-100">
-                                                    {activities.filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase())).map(activity => (
+                                                    {activities.filter(a => (a.name || a.title || '').toLowerCase().includes(searchQuery.toLowerCase())).map(activity => (
                                                         <tr key={activity.id} className="hover:bg-gray-50 transition">
-                                                            <td className="px-6 py-4 font-medium text-gray-900">{activity.title}</td>
-                                                            <td className="px-6 py-4 text-gray-600">{activity.category}</td>
+                                                            <td className="px-6 py-4 font-medium text-gray-900">{activity.name || activity.title}</td>
+                                                            <td className="px-6 py-4 text-gray-600">{activity.Category || activity.category}</td>
                                                             <td className="px-6 py-4 font-bold text-teal-900">{activity.price} MAD</td>
                                                             <td className="px-6 py-4 text-gray-500">{activity.duration}</td>
+                                                            <td className="px-6 py-4">
+                                                                <div className="flex items-center gap-2">
+                                                                    <Switch
+                                                                        checked={activity.available !== false}
+                                                                        onCheckedChange={() => handleActivityAvailabilityToggle(activity)}
+                                                                    />
+                                                                    <span className="text-sm text-gray-500">{activity.available !== false ? 'Available' : 'Unavailable'}</span>
+                                                                </div>
+                                                            </td>
                                                             <td className="px-6 py-4 text-right flex justify-end gap-2">
                                                                 <Button variant="ghost" size="icon" onClick={() => handleEdit(activity)}><Edit3 className="w-4 h-4 text-teal-600" /></Button>
                                                                 <Button variant="ghost" size="icon" onClick={() => handleDelete(activity.id, 'activities')}><Trash2 className="w-4 h-4 text-red-500" /></Button>
@@ -543,19 +641,41 @@ export function AdminDashboard() {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-100">
-                                                    {bookings.filter(b => b.customer.toLowerCase().includes(searchQuery.toLowerCase())).map(booking => (
-                                                        <tr key={booking.id} className="hover:bg-gray-50 transition">
-                                                            <td className="px-6 py-4 font-medium text-gray-900">{booking.customer}</td>
-                                                            <td className="px-6 py-4 text-gray-600">{booking.item}</td>
-                                                            <td className="px-6 py-4 text-gray-500">{booking.date}</td>
-                                                            <td className="px-6 py-4 font-bold text-teal-900">{booking.amount}</td>
+                                                    {bookings.filter(b => (b.customerName || '').toLowerCase().includes(searchQuery.toLowerCase())).map(booking => (
+                                                        <tr key={booking._id} className="hover:bg-gray-50 transition">
+                                                            <td className="px-6 py-4 font-medium text-gray-900">{booking.customerName}</td>
+                                                            <td className="px-6 py-4 text-gray-600">{booking.serviceType}</td>
+                                                            <td className="px-6 py-4 text-gray-500">{new Date(booking.startDate).toLocaleDateString()}</td>
+                                                            <td className="px-6 py-4 font-bold text-teal-900">{booking.totalPrice} MAD</td>
                                                             <td className="px-6 py-4">
-                                                                <Badge className={booking.status === 'Confirmed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}>
-                                                                    {booking.status}
+                                                                <Badge className={
+                                                                    booking.status === 'confirmed' ? 'bg-green-100 text-green-700' :
+                                                                        (booking.status === 'cancellation_requested' || booking.status === 'change_requested') ? 'bg-purple-100 text-purple-700' :
+                                                                            booking.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                                                                                'bg-red-100 text-red-700'
+                                                                }>
+                                                                    {booking.status.replace('_', ' ')}
                                                                 </Badge>
+                                                                {booking.changeRequestDetails && (
+                                                                    <div className="text-xs text-gray-500 mt-1 max-w-xs">{booking.changeRequestDetails}</div>
+                                                                )}
                                                             </td>
-                                                            <td className="px-6 py-4 text-right">
-                                                                <Button variant="ghost" size="sm" onClick={() => handleDelete(booking.id, 'bookings')} className="text-red-500 hover:text-red-700">Cancel</Button>
+                                                            <td className="px-6 py-4 text-right flex justify-end gap-2">
+                                                                {(booking.status === 'pending' || booking.status === 'change_requested') && (
+                                                                    <>
+                                                                        <Button variant="ghost" size="sm" onClick={() => handleBookingStatus(booking._id, 'confirmed')} className="text-green-600 hover:text-green-800 hover:bg-green-50">
+                                                                            Confirm
+                                                                        </Button>
+                                                                        <Button variant="ghost" size="sm" onClick={() => handleBookingStatus(booking._id, 'cancelled')} className="text-red-500 hover:text-red-700 hover:bg-red-50">
+                                                                            Cancel
+                                                                        </Button>
+                                                                    </>
+                                                                )}
+                                                                {(booking.status === 'confirmed' || booking.status === 'cancellation_requested') && (
+                                                                    <Button variant="ghost" size="sm" onClick={() => handleBookingStatus(booking._id, 'cancelled')} className="text-red-500 hover:text-red-700 hover:bg-red-50">
+                                                                        Cancel
+                                                                    </Button>
+                                                                )}
                                                             </td>
                                                         </tr>
                                                     ))}

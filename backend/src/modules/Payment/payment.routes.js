@@ -15,11 +15,10 @@ const validate = require('../../middleware/validate.middleware');
 router.post('/', authenticate, validateCreatePayment, validate, paymentController.createPayment);
 
 // Cart Checkout
-router.post('/checkout', (req, res, next) => {
-  // Authentication is optional for checkout if guest is allowed, 
-  // but let's check for user if token is present
-  next();
-}, paymentController.processCheckout);
+router.post('/checkout', authenticate, paymentController.processCheckout);
+
+// Confirm Payment Success
+router.post('/confirm-payment', authenticate, paymentController.confirmPaymentSuccess);
 // Get user payment history
 router.get('/', authenticate, paymentController.getUserPayments);
 
